@@ -3,15 +3,18 @@ import Combine
 import SwiftData
 import Network
 
-@MainActor
 class ArticleRepository: ObservableObject {
     @Published var articles: [MovieItem] = []
 
     private let service: ArticleService
     private let cache: ArticleCache
     private let context: ModelContext
+    private let monitor: NWPathMonitor
+    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
 
     private var cancellables = Set<AnyCancellable>()
+    
+    private var isOffline = false
     private var currentPage = 1
     private var isLoading = false
     private var canLoadMore = true
@@ -20,6 +23,8 @@ class ArticleRepository: ObservableObject {
         self.service = ArticleService()
         self.cache = ArticleCache(context: context)
         self.context = context
+        self.monitor = NWPathMonitor()
+        self.startMonitoring()
 
         loadNextPage()
     }
@@ -49,7 +54,7 @@ class ArticleRepository: ObservableObject {
                 guard let self = self else { return }
 
                 if newItems.isEmpty {
-                    self.canLoadMore = false
+                    self.canLoadMore = true
                 } else {
                     self.articles.append(contentsOf: newItems)
                     self.currentPage += 1
@@ -69,6 +74,23 @@ class ArticleRepository: ObservableObject {
         URLSession.shared.dataTask(with: url) { data, _, _ in
             completion(data)
         }.resume()
+    }
+    
+    private func startMonitoring() {
+        monitor.pathUpdateHandler = { [weak self] path in
+            guard let self = self else { return }
+            self.isOffline = path.status != .satisfied
+
+            if !self.isOffline {
+                self.loadNextPage()
+            } else {
+                // Load cached list if available
+                if let cachedList = cache.load() {
+                    self.articles = cachedList.results
+                }
+            }
+        }
+        monitor.start(queue: monitorQueue)
     }
 }
 
@@ -95,30 +117,9 @@ class ArticleRepository: ObservableObject {
 //        self.loadInitialData()
 //    }
 //
-//    private func loadInitialData() {
-//        // Load cached list if available
-//        if let cachedList = cache.load() {
-//            self.articles = cachedList.results
-//        }
+
 //
-//        // Fetch from API if online
-//        if !isOffline {
-//            fetchFromAPI()
-//        }
-//    }
-//
-//    private func startMonitoring() {
-//        monitor.pathUpdateHandler = { [weak self] path in
-//            guard let self = self else { return }
-//            let wasOffline = self.isOffline
-//            self.isOffline = path.status != .satisfied
-//
-//            if wasOffline && !self.isOffline {
-//                self.fetchFromAPI()
-//            }
-//        }
-//        monitor.start(queue: monitorQueue)
-//    }
+
 //
 //    func fetchFromAPI(page: Int) {
 //        service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: page))
