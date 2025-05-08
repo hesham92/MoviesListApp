@@ -1,5 +1,21 @@
 import Foundation
 
+
+protocol Endpoint {
+    var baseURL: String { get }
+    var path: String { get }
+    var method: RequestMethod { get }
+    var header: [String: String]? { get }
+    var body: [String: String]? { get }
+}
+
+extension Endpoint {
+    var baseURL: String {
+        return "https://api.themoviedb.org/3/"
+    }
+}
+
+
 enum ApiEndpoints {
     case moviePopular(page: Int)
     case movieDetail(id: Int)
@@ -9,11 +25,12 @@ extension ApiEndpoints: Endpoint {
     var path: String {
         switch self {
         case .moviePopular(let page):
-            return "movie/popular?page=\(page)"
+            return "discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&page=\(page)"
         case .movieDetail(let id):
             return "movie/\(id)"
         }
     }
+    
 
     var method: RequestMethod {
         switch self {

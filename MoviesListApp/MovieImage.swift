@@ -4,18 +4,19 @@ struct MovieImage: View {
     var path: String = ""
 
     var body: some View {
-        GeometryReader { geometry in
-            AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(path)")) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: geometry.size.width, height: geometry.size.height)
-                    .clipped()
-            } placeholder: {
-                Color.gray.frame(width: geometry.size.width, height: geometry.size.height)
-            }
-            .cornerRadius(10)
-        }
+        AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500\(path)")) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .frame(maxWidth: .infinity, maxHeight: 140)
+                            .scaledToFill()
+                            .clipped()
+                    default:
+                        EmptyView() // No placeholder, just empty
+                    }
+                }
+                .cornerRadius(10)
     }
 }
 

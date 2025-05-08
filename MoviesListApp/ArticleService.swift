@@ -2,13 +2,33 @@ import Foundation
 import Combine
 
 class ArticleService {
-    private let url = URL(string: "https://api.themoviedb.org/3/discover/movie?include_adult=false&sort_by=popularity.desc&page=1")!
 
-    func fetchArticles() -> AnyPublisher<[Article], Error> {
-        URLSession.shared.dataTaskPublisher(for: url)
+    func fetchArticles(endpoint: Endpoint) -> AnyPublisher<PopularMovieList, Error> {
+        guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
+            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = endpoint.method.rawValue
+        request.allHTTPHeaderFields = endpoint.header
+        
+        if let body = endpoint.body {
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
+        }
+        
+        return URLSession.shared.dataTaskPublisher(for: request)
             .map(\.data)
-            .decode(type: [Article].self, decoder: JSONDecoder())
+            .decode(type: PopularMovieList.self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
+            .handleEvents(receiveCompletion: { completion in
+                        switch completion {
+                        case .failure(let error):
+                            // Log the error
+                            print("Error occurred: \(error)")
+                        case .finished:
+                            break
+                        }
+                    })
             .eraseToAnyPublisher()
     }
 }

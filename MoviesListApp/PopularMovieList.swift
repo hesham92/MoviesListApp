@@ -7,12 +7,12 @@ class PopularMovieList: Identifiable, Codable {
     var page: Int
     var totalResults: Int
     var totalPages: Int
-
-    @Relationship(deleteRule: .cascade)
     var results: [MovieItem] = []
 
     enum CodingKeys: String, CodingKey {
-        case page, totalResults, totalPages, results
+        case page, results
+        case totalResults = "total_results"
+        case totalPages = "total_pages"
     }
 
     init(page: Int, totalResults: Int, totalPages: Int, results: [MovieItem]) {
@@ -42,28 +42,39 @@ class PopularMovieList: Identifiable, Codable {
 
 @Model
 class MovieItem: Identifiable, Codable {
-    @Attribute(.unique) var id: Int
+    var id: Int
     var title: String
+    var posterPath: String
+    var releaseDate: String
+    var imageData: Data? = nil // Add this
 
     enum CodingKeys: String, CodingKey {
         case id, title
+        case posterPath = "poster_path"
+        case releaseDate = "release_date"
     }
 
-    init(id: Int, title: String) {
+    init(id: Int, title: String, posterPath: String, releaseDate: String) {
         self.id = id
         self.title = title
+        self.posterPath = posterPath
+        self.releaseDate = releaseDate
     }
 
     required convenience init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let id = try container.decode(Int.self, forKey: .id)
         let title = try container.decode(String.self, forKey: .title)
-        self.init(id: id, title: title)
+        let posterPath = try container.decode(String.self, forKey: .posterPath)
+        let releaseDate = try container.decode(String.self, forKey: .releaseDate)
+        self.init(id: id, title: title, posterPath: posterPath, releaseDate: releaseDate)
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encode(title, forKey: .title)
+        try container.encode(posterPath, forKey: .posterPath)
+        try container.encode(releaseDate, forKey: .releaseDate)
     }
 }

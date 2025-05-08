@@ -3,57 +3,161 @@ import Combine
 import SwiftData
 import Network
 
+@MainActor
 class ArticleRepository: ObservableObject {
-    @Published var articles: [Article] = []
+    @Published var articles: [MovieItem] = []
 
     private let service: ArticleService
     private let cache: ArticleCache
-    private let monitor: NWPathMonitor
-    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
-    private var cancellables = Set<AnyCancellable>()
+    private let context: ModelContext
 
-    private var isOffline = false
+    private var cancellables = Set<AnyCancellable>()
+    private var currentPage = 1
+    private var isLoading = false
+    private var canLoadMore = true
 
     init(context: ModelContext) {
         self.service = ArticleService()
         self.cache = ArticleCache(context: context)
-        self.monitor = NWPathMonitor()
-        self.startMonitoring()
-        loadInitialData()
+        self.context = context
+
+        loadNextPage()
     }
 
-    private func loadInitialData() {
-        // Load cached first
-        articles = cache.load()
-        // Try to fetch online if available
-        if !isOffline {
-            fetchFromAPI()
-        }
-    }
+    func loadNextPage() {
+        guard !isLoading && canLoadMore else { return }
+        isLoading = true
 
-    private func startMonitoring() {
-        monitor.pathUpdateHandler = { [weak self] path in
-            guard let self = self else { return }
-            let wasOffline = self.isOffline
-            self.isOffline = path.status != .satisfied
+        service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: currentPage))
+            .handleEvents(receiveOutput: { [weak self] fetched in
+                guard let self = self else { return }
 
-            // If just reconnected
-            if wasOffline && !self.isOffline {
-                self.fetchFromAPI()
+                for item in fetched.results {
+                    self.downloadImage(for: item) { imageData in
+                        DispatchQueue.main.async {
+                            item.imageData = imageData
+                            try? self.context.save()
+                        }
+                       
+                    }
+                }
+            })
+            .map { $0.results }
+            .replaceError(with: [])
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newItems in
+                guard let self = self else { return }
+
+                if newItems.isEmpty {
+                    self.canLoadMore = false
+                } else {
+                    self.articles.append(contentsOf: newItems)
+                    self.currentPage += 1
+                }
+
+                self.isLoading = false
             }
-        }
-        monitor.start(queue: monitorQueue)
-    }
-
-    private func fetchFromAPI() {
-        service.fetchArticles()
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { [weak self] fetched in
-                      self?.cache.save(fetched)
-                      DispatchQueue.main.async {
-                          self?.articles = fetched
-                      }
-                  })
             .store(in: &cancellables)
     }
+
+    private func downloadImage(for item: MovieItem, completion: @escaping (Data?) -> Void) {
+        guard let url = URL(string: "https://image.tmdb.org/t/p/w500" + item.posterPath) else {
+            completion(nil)
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            completion(data)
+        }.resume()
+    }
 }
+
+
+
+//class ArticleRepository: ObservableObject {
+//    @Published var articles: [MovieItem] = []
+//
+//    private let service: ArticleService
+//    private let cache: ArticleCache
+//    private let monitor: NWPathMonitor
+//    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
+//    private var cancellables = Set<AnyCancellable>()
+//    private let context: ModelContext
+//
+//    private var isOffline = false
+//
+//    init(context: ModelContext) {
+//        self.service = ArticleService()
+//        self.cache = ArticleCache(context: context)
+//        self.monitor = NWPathMonitor()
+//        self.context = context
+//        self.startMonitoring()
+//        self.loadInitialData()
+//    }
+//
+//    private func loadInitialData() {
+//        // Load cached list if available
+//        if let cachedList = cache.load() {
+//            self.articles = cachedList.results
+//        }
+//
+//        // Fetch from API if online
+//        if !isOffline {
+//            fetchFromAPI()
+//        }
+//    }
+//
+//    private func startMonitoring() {
+//        monitor.pathUpdateHandler = { [weak self] path in
+//            guard let self = self else { return }
+//            let wasOffline = self.isOffline
+//            self.isOffline = path.status != .satisfied
+//
+//            if wasOffline && !self.isOffline {
+//                self.fetchFromAPI()
+//            }
+//        }
+//        monitor.start(queue: monitorQueue)
+//    }
+//
+//    func fetchFromAPI(page: Int) {
+//        service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: page))
+//            .sink(receiveCompletion: { _ in },
+//                  receiveValue: { [weak self] fetched in
+//                      guard let self = self else { return }
+//                          self.articles = fetched.results // Show immediately
+//                          self.cache.save(fetched)       // Cache without images
+//                      
+//
+//                      // Download images in background
+//                      for item in fetched.results {
+//                          self.downloadImage(for: item) { imageData in
+//                                  item.imageData = imageData
+//                                  try? self.context.save()
+//                                  
+//                                  // Trigger UI update
+//                                  if let index = self.articles.firstIndex(where: { $0.id == item.id }) {
+//                                      self.articles[index] = item
+//                                  }
+//                          }
+//                      }
+//                  })
+//            .store(in: &cancellables)
+//    }
+//    
+//   
+//    
+//    
+//    
+//    
+//    private func downloadImage(for item: MovieItem, completion: @escaping (Data?) -> Void) {
+//        guard let url = URL(string: "https://image.tmdb.org/t/p/w500" + item.posterPath) else {
+//            completion(nil)
+//            return
+//        }
+//
+//        URLSession.shared.dataTask(with: url) { data, _, _ in
+//            completion(data)
+//        }.resume()
+//    }
+//}
