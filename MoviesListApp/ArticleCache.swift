@@ -9,7 +9,6 @@ class ArticleCache {
     }
 
     func save(_ movieList: PopularMovieList) {
-        // Remove existing PopularMovieList and its related MovieItems
         let descriptor = FetchDescriptor<PopularMovieList>()
         if let existingLists = try? context.fetch(descriptor) {
             for list in existingLists {
