@@ -1,6 +1,7 @@
 import SwiftUI
+import SwiftData
 
-struct SegmentedControlView: View {
+struct FilterView: View {
     let filters: [String]
     @Binding var selectedFilter: String
 
@@ -31,4 +32,3 @@ struct SegmentedControlView: View {
         }
     }
 }
-

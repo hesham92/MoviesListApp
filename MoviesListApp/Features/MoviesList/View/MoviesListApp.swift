@@ -1,10 +1,3 @@
-//
-//  MoviesListAppApp.swift
-//  MoviesListApp
-//
-//  Created by Hesham on 08/05/2025.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -13,7 +6,9 @@ struct MoviesListApp: App {
     var body: some Scene {
         WindowGroup {
             MoviesListView()
+                .withRouter()
         }
         .modelContainer(for: MovieItem.self)
+        
     }
 }
