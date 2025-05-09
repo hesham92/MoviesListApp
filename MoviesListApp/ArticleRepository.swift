@@ -24,46 +24,48 @@ class ArticleRepository: ObservableObject {
         self.cache = ArticleCache(context: context)
         self.context = context
         self.monitor = NWPathMonitor()
-        self.startMonitoring()
+    }
 
+    func configure() {
+        startMonitoring()
         loadNextPage()
     }
-
+    
     func loadNextPage() {
-        guard !isLoading, canLoadMore else { return }
-        isLoading = true
+        guard canLoadMore && !isOffline else { return }
 
-        let endpoint = ApiEndpoints.moviePopular(page: currentPage)
-
-        service.fetchArticles(endpoint: endpoint)
-            .map(\.results)
-            .replaceError(with: [])
+        service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: currentPage))
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] newItems in
-                guard let self = self else { return }
+            .sink(
+                receiveCompletion: { completion in
 
-                if newItems.isEmpty {
-                    self.canLoadMore = false
-                } else {
-                    self.articles.append(contentsOf: newItems)
+                    if case .failure(let error) = completion {
+                        print("Error fetching articles:", error)
+                    }
+                },
+                receiveValue: { [weak self] response in
+                    guard let self = self else { return }
+
+                    if response.totalPages <= self.currentPage {
+                        self.canLoadMore = false
+                    }
+
+                    self.articles.append(contentsOf: response.results)
                     self.currentPage += 1
 
-                    for item in newItems {
+                    for item in response.results {
                         self.downloadImage(for: item) { [weak self] imageData in
                             guard let self = self else { return }
-                            DispatchQueue.main.async {
-                                item.imageData = imageData
-                                try? self.context.save()
-                            }
+                            item.imageData = imageData
+                            try? self.context.save()
                         }
                     }
-                }
 
-                self.isLoading = false
-            }
+                    self.isLoading = false
+                }
+            )
             .store(in: &cancellables)
     }
-
 
     private func downloadImage(for item: MovieItem, completion: @escaping (Data?) -> Void) {
         guard let url = URL(string: "https://image.tmdb.org/t/p/w500" + item.posterPath) else {
@@ -75,21 +77,24 @@ class ArticleRepository: ObservableObject {
             completion(data)
         }.resume()
     }
-    
+
     private func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
-            self.isOffline = path.status != .satisfied
 
-            if !self.isOffline {
-                self.loadNextPage()
-            } else {
-                // Load cached list if available
-                if let cachedList = cache.load() {
-                    self.articles = cachedList.results
+                self.isOffline = path.status != .satisfied
+
+                if self.isOffline {
+                    if let cachedList = self.cache.load() {
+                        self.articles = cachedList.results
+                    }
+                } else {
+                    self.loadNextPage()
                 }
             }
-        }
+        
+
         monitor.start(queue: monitorQueue)
     }
 }
+

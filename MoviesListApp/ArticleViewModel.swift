@@ -16,7 +16,12 @@ class ArticleViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .assign(to: &$articles)
     }
-
+    
+    func configure() {
+        // Configure the repository and load the first page of articles
+        repository.configure() // Now this triggers the loading logic
+    }
+    
     func loadNextPage() {
         repository.loadNextPage()
     }

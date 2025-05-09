@@ -75,5 +75,8 @@ struct ArticleListContent: View {
             .padding()
         }
         .background(Color(UIColor.black))
+        .onAppear {
+            viewModel.configure() // Trigger the loading of the first page when the view appears
+        }
     }
 }
