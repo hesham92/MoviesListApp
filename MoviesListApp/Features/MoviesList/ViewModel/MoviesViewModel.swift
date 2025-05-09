@@ -24,6 +24,7 @@ class MoviesListViewModel: ObservableObject {
     
     private func bindPublishers() {
         networkMonitor.$isConnected
+            .dropFirst() // Ignore initial emission
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
@@ -36,6 +37,7 @@ class MoviesListViewModel: ObservableObject {
         
         // Subscribe to the repository's publisher
         repository.$movies
+            .dropFirst() // Ignore initial emission
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
                 guard let self else { return }
@@ -46,13 +48,14 @@ class MoviesListViewModel: ObservableObject {
             .store(in: &cancellables)
         
         repository.$totalPages
+            .dropFirst() // Ignore initial emission
             .assign(to: \.totalPages, on: self)
             .store(in: &cancellables)
     }
     
     @Published var movies: [MovieItem] = []
     @Published var isConnected: Bool = true
-    private var totalPages = 2
+    private var totalPages = 10
     private var currentPage = 1
 
     private let repository: MoviesRepository
