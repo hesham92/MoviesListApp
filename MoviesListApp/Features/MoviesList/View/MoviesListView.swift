@@ -11,67 +11,89 @@ struct MoviesListView: View {
 
 struct MoviesListContent: View {
     @ObservedObject private var viewModel: MoviesListViewModel
-    
+    @State private var showAlert = false
+
     init(modelContext: ModelContext) {
         _viewModel = ObservedObject(wrappedValue: MoviesListViewModel(context: modelContext))
     }
     
-    // Fixed-size columns
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
     
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(viewModel.movies.indices, id: \.self) { index in
-                    let item = viewModel.movies[index]
-                    VStack(alignment: .leading, spacing: 8) {
-                        ZStack {
-                            // Always show gray background as placeholder
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(height: 140)
-                                .cornerRadius(8)
-                            
-                            if let data = item.imageData,
-                               let uiImage = UIImage(data: data) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(height: 140)
-                                    .clipped()
-                                    .cornerRadius(8)
-                            }
-                        }
-                        
+        ZStack {
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(viewModel.movies.indices, id: \.self) { index in
+                        let item = viewModel.movies[index]
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(item.title)
-                                .font(.headline)
-                                .foregroundColor(.white)
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(height: 140)
+                                    .cornerRadius(8)
+                                
+                                if let data = item.imageData,
+                                   let uiImage = UIImage(data: data) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(height: 140)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                }
+                            }
                             
-                            Text(item.releaseDate)
-                                .font(.subheadline)
-                                .foregroundColor(.white)
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(item.title)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                
+                                Text(item.releaseDate)
+                                    .font(.subheadline)
+                                    .foregroundColor(.white)
+                            }
+                            .padding(.leading, 8)
                         }
-                        .padding(.leading, 8)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .cornerRadius(16)
-                    .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                    .onAppear {
-                        if index == viewModel.movies.count - 1 {
-                            viewModel.loadData()
+                        .frame(maxWidth: .infinity)
+                        .cornerRadius(16)
+                        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        .onAppear {
+                            if index == viewModel.movies.count - 1 {
+                                viewModel.loadData()
+                            }
                         }
                     }
                 }
+                .padding()
             }
-            .padding()
+            .onAppear {
+                viewModel.viewDidAppear()
+            }
+
+            if viewModel.isLoading {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.5)
+            }
         }
         .background(Color(UIColor.black))
-        .onAppear {
-            viewModel.viewDidAppear() // Trigger the loading of the first page when the view appears
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Error"),
+                message: Text(viewModel.errorMessage ?? "Unknown error"),
+                dismissButton: .default(Text("OK")) {
+                    viewModel.errorMessage = nil
+                }
+            )
+        }
+        .onChange(of: viewModel.errorMessage) { error in
+            showAlert = error != nil
         }
     }
 }
+
