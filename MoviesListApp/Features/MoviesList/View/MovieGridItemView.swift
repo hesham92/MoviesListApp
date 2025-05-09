@@ -4,11 +4,13 @@ import SwiftData
 struct MovieGridItemView: View {
     let item: MovieItem
     @Binding var selectedMovieId: Int?
+    @Environment(Router.self) var router
 
     var body: some View {
-        Button {
+        Button(action: {
             selectedMovieId = item.id
-        } label: {
+            router.navigateToSetup(id: item.id)
+        }) {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack {
                     Rectangle()
@@ -27,21 +29,30 @@ struct MovieGridItemView: View {
                     }
                 }
 
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(item.title)
                         .font(.headline)
                         .foregroundColor(.white)
 
                     Text(item.releaseDate)
                         .font(.subheadline)
-                        .foregroundColor(.white)
+                        .foregroundColor(.white.opacity(0.8))
                 }
-                .padding(.leading, 8)
+                .padding(.horizontal, 4)
+                .padding(.bottom, 4)
             }
-            .frame(maxWidth: .infinity)
-            .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .padding(6)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(selectedMovieId == item.id ? Color.blue.opacity(0.2) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(selectedMovieId == item.id ? Color.blue : Color.clear, lineWidth: 2)
+            )
+            .contentShape(Rectangle()) // Ensures the whole area is tappable
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(PlainButtonStyle()) // Prevents blue tint and preserves custom styles
     }
 }
+
