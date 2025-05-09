@@ -3,11 +3,11 @@ import SwiftUI
 struct MovieDetailsView: View {
     @ObservedObject private var viewModel: MovieDetailsViewModel
     @Environment(Router.self) var router
-
+    
     init(movieId: Int) {
         _viewModel = ObservedObject(wrappedValue: MovieDetailsViewModel(movieId: movieId))
     }
-
+    
     var body: some View {
         ScrollView {
             if viewModel.isLoading {
@@ -24,52 +24,41 @@ struct MovieDetailsView: View {
                 }
                 .padding()
             } else if let movie = viewModel.movie {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
                     // Poster Image
+                    MovieImage(path: movie.posterPath)
                     
-                   // MovieImage(path: movie.posterPath)
-                    if let posterURL = URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath)") {
-                        AsyncImage(url: posterURL) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .cornerRadius(12)
-                            case .failure:
-                                Image(systemName: "photo")
-                            @unknown default:
-                                EmptyView()
+                    HStack(alignment: .top) {
+                        MovieImage(path: movie.posterPath)
+                            .frame(width: 50, height: 100)
+                            .padding(.all, 8)
+                        
+                        VStack(alignment: .leading) {
+                            Text("\(movie.title) (\(movie.releaseDate))")
+                                .font(.system(size: 16, weight: .bold))
+                            
+                            if !movie.genres.isEmpty {
+                                Text(movie.genres.map { $0.name }.joined(separator: ", "))
                             }
                         }
+                        .padding(.top, 10)
                     }
                     
-                    VStack(alignment: .leading) {
-                        Text("\(movie.title) (\(movie.releaseDate))")
-                            .font(.system(size: 16, weight: .bold))
-                        
-                        if !movie.genres.isEmpty {
-                            Text(movie.genres.map { $0.name }.joined(separator: ", "))
-                        }
-                    }
                     
                     Text(movie.overview)
-                        .font(.system(size: 14)) // Custom small font size
+                        .font(.system(size: 14))
                     
+                    Spacer(minLength: 30)
                     
-                    Spacer()
-
-                    if let homepage = movie.homepage, let url = URL(string: homepage) {
+                    if let homepage = movie.homepage {
                         HStack {
-                                    Text("Homepage:")
-                                        .bold()
-                                        .foregroundColor(.white)
-                                    Text(homepage)
-                                        .underline()
-                                        .foregroundColor(.blue)
-                                }
+                            Text("Homepage:")
+                                .bold()
+                                .foregroundColor(.white)
+                            Text(homepage)
+                                .underline()
+                                .foregroundColor(.blue)
+                        }
                     }
                     
                     if !movie.spokenLanguages.isEmpty {
@@ -80,16 +69,24 @@ struct MovieDetailsView: View {
                         }
                     }
                     
-                    VStack(alignment: .leading) {
-                        HStack {
+                    HStack {
+                        VStack(spacing: 2) {
+                            HStack {
+                                Text("Budget:")
+                                    .bold()
+                                Text(movie.budget.formatted(.currency(code: "USD")))
+                            }
+                            
                             HStack {
                                 Text("Status:")
                                     .bold()
                                 Text(movie.status)
                             }
-                            
-                            Spacer()
-
+                        }
+                        
+                        Spacer()
+                        
+                        VStack(alignment: .leading, spacing: 2) {
                             if let runtime = movie.runtime {
                                 HStack {
                                     Text("Runtime:")
@@ -97,16 +94,7 @@ struct MovieDetailsView: View {
                                     Text("\(runtime) minutes")
                                 }
                             }
-                        }
-                        HStack {
-                            HStack {
-                                Text("Budget:")
-                                    .bold()
-                                Text(movie.budget.formatted(.currency(code: "USD")))
-                            }
-                            
-                            Spacer()
-                            
+                                                        
                             HStack {
                                 Text("Revenue:")
                                     .bold()
@@ -114,11 +102,9 @@ struct MovieDetailsView: View {
                             }
                         }
                     }
-                   
-                    
-                    }
+                }
                 .font(.system(size: 12)) // Custom small font size
-                    .padding(.horizontal)
+                .padding(.all, 8)
             } else {
                 Text("No movie data available.")
                     .padding()
@@ -134,7 +120,7 @@ struct MovieDetailsView: View {
             customBackButton, alignment: .topLeading  // Add custom back button on top left
         )
     }
-
+    
     private var customBackButton: some View {
         Button(action: {
             router.popToRoot()

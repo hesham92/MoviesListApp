@@ -9,7 +9,6 @@ struct MovieImage: View {
                     case .success(let image):
                         image
                             .resizable()
-                            .frame(maxWidth: .infinity, maxHeight: 140)
                             .scaledToFill()
                             .clipped()
                     default:
