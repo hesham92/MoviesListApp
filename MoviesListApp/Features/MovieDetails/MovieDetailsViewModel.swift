@@ -10,6 +10,7 @@ class MovieDetailsViewModel: ObservableObject {
 
     func viewDidAppear() {
         bindPublishers()
+        loadData()
     }
     
     func loadData() {
@@ -27,7 +28,7 @@ class MovieDetailsViewModel: ObservableObject {
             .sink { [weak self] respone in
                 guard let self else { return }
                 
-                movie = movie
+                movie = respone
             }
             .store(in: &cancellables)
         

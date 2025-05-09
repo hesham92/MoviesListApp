@@ -9,11 +9,23 @@ struct MovieDetailsView: View {
 
     var body: some View {
         ScrollView {
-            if let movie = viewModel.movie {
+            if viewModel.isLoading {
+                ProgressView("Loading...")
+                    .padding()
+            } else if let error = viewModel.errorMessage {
+                VStack(spacing: 16) {
+                    Text("Error: \(error)")
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                    Button("Retry") {
+                        viewModel.loadData()
+                    }
+                }
+                .padding()
+            } else if let movie = viewModel.movie {
                 VStack(alignment: .leading, spacing: 16) {
-
                     // Poster Image
-                    if let posterURL = URL(string: movie.posterPath) {
+                    if let posterURL = URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath)") {
                         AsyncImage(url: posterURL) { phase in
                             switch phase {
                             case .empty:
@@ -32,14 +44,12 @@ struct MovieDetailsView: View {
                     }
 
                     Group {
-                        // Release Date
                         HStack {
                             Text("Release Date:")
                                 .bold()
                             Text(movie.releaseDate)
                         }
 
-                        // Genres
                         if !movie.genres.isEmpty {
                             HStack {
                                 Text("Genres:")
@@ -48,35 +58,30 @@ struct MovieDetailsView: View {
                             }
                         }
 
-                        // Overview
                         VStack(alignment: .leading) {
                             Text("Overview:")
                                 .bold()
                             Text(movie.overview)
                         }
 
-                        // Homepage
                         if let homepage = movie.homepage, let url = URL(string: homepage) {
                             Link("Homepage", destination: url)
                                 .font(.headline)
                                 .foregroundColor(.blue)
                         }
 
-                        // Budget
                         HStack {
                             Text("Budget:")
                                 .bold()
                             Text(movie.budget.formatted(.currency(code: "USD")))
                         }
 
-                        // Revenue
                         HStack {
                             Text("Revenue:")
                                 .bold()
                             Text(movie.revenue.formatted(.currency(code: "USD")))
                         }
 
-                        // Spoken Languages
                         if !movie.spokenLanguages.isEmpty {
                             HStack {
                                 Text("Languages:")
@@ -85,14 +90,12 @@ struct MovieDetailsView: View {
                             }
                         }
 
-                        // Status
                         HStack {
                             Text("Status:")
                                 .bold()
                             Text(movie.status)
                         }
 
-                        // Runtime
                         if let runtime = movie.runtime {
                             HStack {
                                 Text("Runtime:")
@@ -104,11 +107,13 @@ struct MovieDetailsView: View {
                     .padding(.horizontal)
                 }
                 .padding()
-                .navigationTitle(movie.title)
             } else {
-                ProgressView("Loading...")
+                Text("No movie data available.")
                     .padding()
             }
+        }
+        .onAppear {
+            viewModel.viewDidAppear()
         }
     }
 }
