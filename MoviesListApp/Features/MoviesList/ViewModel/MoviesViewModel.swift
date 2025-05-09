@@ -3,16 +3,7 @@ import Combine
 import SwiftData
 
 @MainActor
-class MoviesViewModel: ObservableObject {
-    @Published var movies: [MovieItem] = []
-    @Published var isConnected: Bool = true
-    private var totalPages = 1
-    private var currentPage = 0
-
-    private let repository: MoviesRepository
-    private let networkMonitor: NetworkMonitor
-    private var cancellables = Set<AnyCancellable>()
-
+class MoviesListViewModel: ObservableObject {
     init(
         context: ModelContext,
         networkMonitor: NetworkMonitor = NetworkMonitor()
@@ -22,6 +13,16 @@ class MoviesViewModel: ObservableObject {
     }
 
     func viewDidAppear() {
+        bindPublishers()
+    }
+    
+    func loadData() {
+        guard currentPage <= totalPages else { return }
+        
+        repository.loadMoviesListData(page: 1, isOnline: isConnected)
+    }
+    
+    private func bindPublishers() {
         networkMonitor.$isConnected
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
@@ -48,10 +49,13 @@ class MoviesViewModel: ObservableObject {
             .assign(to: \.totalPages, on: self)
             .store(in: &cancellables)
     }
+    
+    @Published var movies: [MovieItem] = []
+    @Published var isConnected: Bool = true
+    private var totalPages = 1
+    private var currentPage = 0
 
-    func loadData() {
-        guard currentPage <= totalPages else { return }
-        
-        repository.loadMoviesListData(page: 1, isOnline: isConnected)
-    }
+    private let repository: MoviesRepository
+    private let networkMonitor: NetworkMonitor
+    private var cancellables = Set<AnyCancellable>()
 }

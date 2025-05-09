@@ -10,10 +10,10 @@ struct MoviesListView: View {
 }
 
 struct MoviesListContent: View {
-    @StateObject private var viewModel: MoviesViewModel
+    @ObservedObject private var viewModel: MoviesListViewModel
     
     init(modelContext: ModelContext) {
-        _viewModel = StateObject(wrappedValue: MoviesViewModel(context: modelContext))
+        _viewModel = ObservedObject(wrappedValue: MoviesListViewModel(context: modelContext))
     }
     
     // Fixed-size columns
