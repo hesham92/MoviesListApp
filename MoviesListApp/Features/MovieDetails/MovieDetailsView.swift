@@ -70,7 +70,7 @@ struct MovieDetailsView: View {
                     }
                     
                     HStack {
-                        VStack(spacing: 2) {
+                        VStack(alignment: .leading, spacing: 2) {
                             HStack {
                                 Text("Budget:")
                                     .bold()

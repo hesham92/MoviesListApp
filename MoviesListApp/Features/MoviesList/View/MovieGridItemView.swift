@@ -42,14 +42,6 @@ struct MovieGridItemView: View {
                 .padding(.bottom, 4)
             }
             .padding(6)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(selectedMovieId == item.id ? Color.blue.opacity(0.2) : Color.clear)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(selectedMovieId == item.id ? Color.blue : Color.clear, lineWidth: 2)
-            )
             .contentShape(Rectangle()) // Ensures the whole area is tappable
         }
         .buttonStyle(PlainButtonStyle()) // Prevents blue tint and preserves custom styles
