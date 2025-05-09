@@ -3,7 +3,7 @@ import Combine
 import SwiftData
 import Network
 
-class MoviesRepository: ObservableObject {
+class MoviesListRepository: ObservableObject {
     @Published var movies: [MovieItem] = []
     @Published var totalPages: Int = 10
     @Published var isLoading: Bool = false
@@ -11,10 +11,10 @@ class MoviesRepository: ObservableObject {
     
     init(
         context: ModelContext,
-        moviesService: MoviesService = MoviesService()
+        networkClient: NetworkClient = NetworkClient()
     ) {
         self.cache = MoviesCache(modelContext: context)
-        self.service = moviesService
+        self.networkClient = networkClient
     }
     
     func loadMoviesListData(page: Int, isOnline: Bool) {
@@ -26,7 +26,7 @@ class MoviesRepository: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        service.fetchArticles(endpoint: ApiEndpoints.moviesList(page: page))
+        networkClient.getData(endpoint: ApiEndpoints.moviesList(page: page))
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: {[weak self] completion in
@@ -37,7 +37,7 @@ class MoviesRepository: ObservableObject {
                         errorMessage = error.localizedDescription
                     }
                 },
-                receiveValue: { [weak self] response in
+                receiveValue: { [weak self] (response: MovieItemListResponse) in
                     guard let self else { return }
 
                     movies.append(contentsOf: response.results)
@@ -69,7 +69,7 @@ class MoviesRepository: ObservableObject {
     }
     
     
-    private let service: MoviesService
+    private let networkClient: NetworkClient
     private let cache: MoviesCache
     private var cancellables = Set<AnyCancellable>()
 }

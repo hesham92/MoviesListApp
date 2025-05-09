@@ -1,8 +1,8 @@
 import Foundation
 import Combine
 
-class MoviesService {
-    func fetchArticles(endpoint: Endpoint) -> AnyPublisher<MovieItemListResponse, Error> {
+class NetworkClient {
+    func getData<T: Decodable>(endpoint: Endpoint) -> AnyPublisher<T, Error> {
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
@@ -17,7 +17,7 @@ class MoviesService {
         
         return URLSession.shared.dataTaskPublisher(for: request)
             .map(\.data)
-            .decode(type: MovieItemListResponse.self, decoder: JSONDecoder())
+            .decode(type: T.self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .handleEvents(receiveCompletion: { completion in
                         switch completion {

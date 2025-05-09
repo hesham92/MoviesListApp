@@ -8,7 +8,7 @@ class MoviesListViewModel: ObservableObject {
         context: ModelContext,
         networkMonitor: NetworkMonitor = NetworkMonitor()
     ) {
-        self.repository = MoviesRepository(context: context)
+        self.repository = MoviesListRepository(context: context)
         self.networkMonitor = networkMonitor
     }
 
@@ -94,7 +94,7 @@ class MoviesListViewModel: ObservableObject {
     private var totalPages = 10
     private var currentPage = 1
 
-    private let repository: MoviesRepository
+    private let repository: MoviesListRepository
     private let networkMonitor: NetworkMonitor
     private var cancellables = Set<AnyCancellable>()
 }
