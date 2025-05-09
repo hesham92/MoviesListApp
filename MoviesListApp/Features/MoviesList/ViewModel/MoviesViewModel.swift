@@ -19,6 +19,9 @@ class MoviesListViewModel: ObservableObject {
     func loadData() {
         guard currentPage <= totalPages else { return }
         
+        isLoading = true
+        errorMessage = nil
+        
         repository.loadMoviesListData(page: currentPage, isOnline: isConnected)
     }
     
@@ -47,6 +50,17 @@ class MoviesListViewModel: ObservableObject {
             }
             .store(in: &cancellables)
         
+        repository.$isLoading
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.isLoading, on: self)
+            .store(in: &cancellables)
+        
+        repository.$errorMessage
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.errorMessage, on: self)
+            .store(in: &cancellables)
+        
+        
         repository.$totalPages
             .dropFirst() // Ignore initial emission
             .assign(to: \.totalPages, on: self)
@@ -54,7 +68,9 @@ class MoviesListViewModel: ObservableObject {
     }
     
     @Published var movies: [MovieItem] = []
-    @Published var isConnected: Bool = true
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String? = nil
+    @Published private var isConnected: Bool = true
     private var totalPages = 10
     private var currentPage = 1
 

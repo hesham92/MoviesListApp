@@ -6,6 +6,8 @@ import Network
 class MoviesRepository: ObservableObject {
     @Published var movies: [MovieItem] = []
     @Published var totalPages: Int = 10
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String? = nil
     
     init(
         context: ModelContext,
@@ -20,13 +22,19 @@ class MoviesRepository: ObservableObject {
             movies = cache.load()
             return
         }
+        
+        isLoading = true
+        errorMessage = nil
 
         service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: page))
             .receive(on: DispatchQueue.main)
             .sink(
-                receiveCompletion: { completion in
+                receiveCompletion: {[weak self] completion in
+                    guard let self else { return }
+                    
+                    isLoading = false
                     if case .failure(let error) = completion {
-                        print("Error fetching articles:", error)
+                        errorMessage = error.localizedDescription
                     }
                 },
                 receiveValue: { [weak self] response in
