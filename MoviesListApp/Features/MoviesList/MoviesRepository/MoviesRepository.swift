@@ -18,10 +18,10 @@ class MoviesRepository: ObservableObject {
     }
     
     func loadMoviesListData(page: Int, isOnline: Bool) {
-        guard isOnline else {
-            movies = cache.load()
-            return
-        }
+//        guard isOnline else {
+//            movies = cache.load()
+//            return
+//        }
         
         isLoading = true
         errorMessage = nil
