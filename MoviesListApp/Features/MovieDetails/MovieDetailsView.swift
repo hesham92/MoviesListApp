@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MovieDetailsView: View {
     @ObservedObject private var viewModel: MovieDetailsViewModel
+    @Environment(Router.self) var router
 
     init(movieId: Int) {
         _viewModel = ObservedObject(wrappedValue: MovieDetailsViewModel(movieId: movieId))
@@ -114,6 +115,19 @@ struct MovieDetailsView: View {
         }
         .onAppear {
             viewModel.viewDidAppear()
+        }
+        .navigationBarBackButtonHidden(true)  // Hides default back button
+        .navigationBarItems(leading: customBackButton) // Custom back button
+    }
+
+    private var customBackButton: some View {
+        Button(action: {
+            router.popToRoot()
+        }) {
+            Image(systemName: "chevron.left")
+                .foregroundColor(.white)  // White color
+                .font(.system(size: 20))  // Smaller size
+                .padding()
         }
     }
 }
