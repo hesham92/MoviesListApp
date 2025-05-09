@@ -16,7 +16,7 @@ struct MovieDetailsView: View {
             } else if let error = viewModel.errorMessage {
                 VStack(spacing: 16) {
                     Text("Error: \(error)")
-                        .foregroundColor(.red)
+                        .foregroundColor(.red)  // Error message in red
                         .multilineTextAlignment(.center)
                     Button("Retry") {
                         viewModel.loadData()
@@ -116,8 +116,12 @@ struct MovieDetailsView: View {
         .onAppear {
             viewModel.viewDidAppear()
         }
-        .navigationBarBackButtonHidden(true)  // Hides default back button
-        .navigationBarItems(leading: customBackButton) // Custom back button
+        .navigationBarHidden(true)  // Hides the default navigation bar
+        .background(Color.black)  // Set background to black
+        .foregroundColor(.white)  // Set all text to white
+        .overlay(
+            customBackButton, alignment: .topLeading  // Add custom back button on top left
+        )
     }
 
     private var customBackButton: some View {
@@ -129,6 +133,8 @@ struct MovieDetailsView: View {
                 .font(.system(size: 20))  // Smaller size
                 .padding()
         }
+        .padding(.top, 16)  // Padding from the top to avoid it being too close to the edge
+        .padding(.leading, 16)  // Padding from the left
     }
 }
 
