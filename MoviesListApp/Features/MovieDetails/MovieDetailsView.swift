@@ -26,6 +26,8 @@ struct MovieDetailsView: View {
             } else if let movie = viewModel.movie {
                 VStack(alignment: .leading, spacing: 16) {
                     // Poster Image
+                    
+                   // MovieImage(path: movie.posterPath)
                     if let posterURL = URL(string: "https://image.tmdb.org/t/p/w500\(movie.posterPath)") {
                         AsyncImage(url: posterURL) { phase in
                             switch phase {
@@ -43,71 +45,80 @@ struct MovieDetailsView: View {
                             }
                         }
                     }
-
-                    Group {
-                        HStack {
-                            Text("Release Date:")
-                                .bold()
-                            Text(movie.releaseDate)
-                        }
-
+                    
+                    VStack(alignment: .leading) {
+                        Text("\(movie.title) (\(movie.releaseDate))")
+                            .font(.system(size: 16, weight: .bold))
+                        
                         if !movie.genres.isEmpty {
+                            Text(movie.genres.map { $0.name }.joined(separator: ", "))
+                        }
+                    }
+                    
+                    Text(movie.overview)
+                        .font(.system(size: 14)) // Custom small font size
+                    
+                    
+                    Spacer()
+
+                    if let homepage = movie.homepage, let url = URL(string: homepage) {
+                        HStack {
+                                    Text("Homepage:")
+                                        .bold()
+                                        .foregroundColor(.white)
+                                    Text(homepage)
+                                        .underline()
+                                        .foregroundColor(.blue)
+                                }
+                    }
+                    
+                    if !movie.spokenLanguages.isEmpty {
+                        HStack {
+                            Text("Languages:")
+                                .bold()
+                            Text(movie.spokenLanguages.map { $0.name }.joined(separator: ", "))
+                        }
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        HStack {
                             HStack {
-                                Text("Genres:")
+                                Text("Status:")
                                     .bold()
-                                Text(movie.genres.map { $0.name }.joined(separator: ", "))
+                                Text(movie.status)
+                            }
+                            
+                            Spacer()
+
+                            if let runtime = movie.runtime {
+                                HStack {
+                                    Text("Runtime:")
+                                        .bold()
+                                    Text("\(runtime) minutes")
+                                }
                             }
                         }
-
-                        VStack(alignment: .leading) {
-                            Text("Overview:")
-                                .bold()
-                            Text(movie.overview)
-                        }
-
-                        if let homepage = movie.homepage, let url = URL(string: homepage) {
-                            Link("Homepage", destination: url)
-                                .font(.headline)
-                                .foregroundColor(.blue)
-                        }
-
                         HStack {
-                            Text("Budget:")
-                                .bold()
-                            Text(movie.budget.formatted(.currency(code: "USD")))
-                        }
-
-                        HStack {
-                            Text("Revenue:")
-                                .bold()
-                            Text(movie.revenue.formatted(.currency(code: "USD")))
-                        }
-
-                        if !movie.spokenLanguages.isEmpty {
                             HStack {
-                                Text("Languages:")
+                                Text("Budget:")
                                     .bold()
-                                Text(movie.spokenLanguages.map { $0.name }.joined(separator: ", "))
+                                Text(movie.budget.formatted(.currency(code: "USD")))
                             }
-                        }
-
-                        HStack {
-                            Text("Status:")
-                                .bold()
-                            Text(movie.status)
-                        }
-
-                        if let runtime = movie.runtime {
+                            
+                            Spacer()
+                            
                             HStack {
-                                Text("Runtime:")
+                                Text("Revenue:")
                                     .bold()
-                                Text("\(runtime) minutes")
+                                Text(movie.revenue.formatted(.currency(code: "USD")))
                             }
                         }
                     }
+                   
+                    
+                    }
+                .font(.system(size: 12)) // Custom small font size
                     .padding(.horizontal)
-                }
-                .padding()
             } else {
                 Text("No movie data available.")
                     .padding()
