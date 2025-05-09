@@ -27,8 +27,8 @@ struct ArticleListContent: View {
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(viewModel.articles.indices, id: \.self) { index in
-                    let item = viewModel.articles[index]
+                ForEach(viewModel.movies.indices, id: \.self) { index in
+                    let item = viewModel.movies[index]
                     VStack(alignment: .leading, spacing: 8) {
                         AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500" + item.posterPath)) { asyncImagePhase in
                             ZStack {
@@ -66,8 +66,8 @@ struct ArticleListContent: View {
                     .cornerRadius(16)
                     .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                     .onAppear {
-                        if index == viewModel.articles.count - 1 {
-                            viewModel.loadNextPage() // ✅ ONLY talks to viewModel
+                        if index == viewModel.movies.count - 1 {
+                            viewModel.loadNextPage()
                         }
                     }
                 }

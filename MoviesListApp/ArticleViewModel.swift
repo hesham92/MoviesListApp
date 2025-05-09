@@ -4,7 +4,7 @@ import SwiftData
 
 @MainActor
 class ArticleViewModel: ObservableObject {
-    @Published var articles: [MovieItem] = []
+    @Published var movies: [MovieItem] = []
 
     private let repository: ArticleRepository
     private var cancellables = Set<AnyCancellable>()
@@ -12,9 +12,9 @@ class ArticleViewModel: ObservableObject {
     init(repository: ArticleRepository) {
         self.repository = repository
 
-        repository.$articles
+        repository.$movies
             .receive(on: DispatchQueue.main)
-            .assign(to: &$articles)
+            .assign(to: &$movies)
     }
     
     func configure() {
