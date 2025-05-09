@@ -14,7 +14,12 @@ class MoviesRepository: ObservableObject {
         self.service = moviesService
     }
     
-    func loadNextPage() {
+    func loadData(isOnline: Bool) {
+        guard isOnline else {
+            movies = cache.load()
+            return
+        }
+
         guard canLoadMore else { return }
 
         service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: currentPage))
@@ -33,6 +38,7 @@ class MoviesRepository: ObservableObject {
                     }
 
                     self.movies.append(contentsOf: response.results)
+                  //  cache.save(response.results)
                     self.currentPage += 1
 
                     downloadImages(results: response.results)

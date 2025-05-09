@@ -2,10 +2,10 @@ import SwiftUI
 import SwiftData
 
 struct MoviesListView: View {
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.modelContext) private var context
     
     var body: some View {
-        MoviesListContent(modelContext: modelContext)
+        MoviesListContent(modelContext: context)
     }
 }
 
@@ -65,7 +65,7 @@ struct MoviesListContent: View {
                     .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
                     .onAppear {
                         if index == viewModel.movies.count - 1 {
-                            viewModel.loadNextPage()
+                            viewModel.loadData()
                         }
                     }
                 }

@@ -1,7 +1,7 @@
 import SwiftData
 import Foundation
 
-class PopularMovieList: Identifiable, Codable {
+class MovieItemListResponse: Identifiable, Codable {
     var id: UUID = UUID()
     var page: Int
     var totalResults: Int

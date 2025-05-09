@@ -23,8 +23,10 @@ class MoviesViewModel: ObservableObject {
         networkMonitor.$isConnected
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
-                self?.isConnected = status
-                self?.loadNextPage()
+                guard let self else { return }
+                
+                isConnected = status
+                loadData()
             }
             .store(in: &cancellables)
         
@@ -35,8 +37,8 @@ class MoviesViewModel: ObservableObject {
             .assign(to: &$movies)
     }
 
-    func loadNextPage() {
-        repository.loadNextPage()
+    func loadData() {
+        repository.loadData(isOnline: isConnected)
     }
 }
 

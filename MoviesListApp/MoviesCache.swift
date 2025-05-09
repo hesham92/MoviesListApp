@@ -2,29 +2,45 @@ import SwiftData
 import SwiftUI
 
 class MoviesCache {
-    @Query
-    private var movieList: [MovieItem]
     let modelContext: ModelContext
-    
+
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
 
-    func save(_ items: [MovieItem]) {
-        // Insert the entire array of MovieItems into the model context
-        for item in items {
-            modelContext.insert(item)  // Insert each MovieItem into the context
-        }
-        
-        // Optionally, commit the changes to the persistent store
+    func clearCache() {
+        let descriptor = FetchDescriptor<MovieItem>()
         do {
-            try modelContext.save()  // Ensure the changes are saved
+            let allItems = try modelContext.fetch(descriptor)
+            for item in allItems {
+                modelContext.delete(item)
+            }
+            try modelContext.save()
+        } catch {
+            print("Error clearing cache: \(error)")
+        }
+    }
+
+    func save(_ items: [MovieItem]) {
+        clearCache()  // Clear existing items before saving new ones
+        for item in items {
+            modelContext.insert(item)
+        }
+        do {
+            try modelContext.save()
         } catch {
             print("Error saving items: \(error)")
         }
     }
 
     func load() -> [MovieItem] {
-        return movieList
+        let descriptor = FetchDescriptor<MovieItem>(sortBy: [SortDescriptor(\.title)])
+        do {
+            return try modelContext.fetch(descriptor)
+        } catch {
+            print("Error loading movies: \(error)")
+            return []
+        }
     }
 }
+
