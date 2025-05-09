@@ -26,7 +26,7 @@ class MoviesRepository: ObservableObject {
         isLoading = true
         errorMessage = nil
 
-        service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: page))
+        service.fetchArticles(endpoint: ApiEndpoints.moviesList(page: page))
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: {[weak self] completion in

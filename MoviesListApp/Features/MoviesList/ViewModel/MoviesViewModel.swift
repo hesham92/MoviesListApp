@@ -67,6 +67,26 @@ class MoviesListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
+    // This function is called whenever the filter changes to apply the selected filter
+//    private func filterMovies() {
+//        // Filter the movies based on the selected filter
+//        if selectedFilter == "All" {
+//            filteredMovies = movies  // Show all movies
+//        } else {
+//            filteredMovies = movies.filter { movie in
+//                movie.genre == selectedFilter
+//            }
+//        }
+//    }
+    
+    @Published var selectedFilter: String = "All" {
+        didSet {
+            // Apply filter when the selected filter changes
+           // filterMovies()
+        }
+    }
+    
+    var filteredMovies: [MovieItem] = []
     @Published var movies: [MovieItem] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil

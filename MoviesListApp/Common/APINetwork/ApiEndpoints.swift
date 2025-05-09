@@ -1,6 +1,5 @@
 import Foundation
 
-
 protocol Endpoint {
     var baseURL: String { get }
     var path: String { get }
@@ -17,14 +16,17 @@ extension Endpoint {
 
 
 enum ApiEndpoints {
-    case moviePopular(page: Int)
+    case moviesGenres
+    case moviesList(page: Int)
     case movieDetail(id: Int)
 }
 
 extension ApiEndpoints: Endpoint {
     var path: String {
         switch self {
-        case .moviePopular(let page):
+        case .moviesGenres:
+            return "genre/movie/list?language=en"
+        case .moviesList(let page):
             return "discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc&page=\(page)"
         case .movieDetail(let id):
             return "movie/\(id)"
@@ -34,14 +36,14 @@ extension ApiEndpoints: Endpoint {
 
     var method: RequestMethod {
         switch self {
-        case .moviePopular, .movieDetail:
+        case .moviesGenres, .moviesList, .movieDetail:
             return .get
         }
     }
 
     var header: [String: String]? {
         switch self {
-        case .moviePopular, .movieDetail:
+        case .moviesGenres, .moviesList, .movieDetail:
             return [
                 "Authorization": "Bearer \(API_KEY)",
                 "Content-Type": "application/json;charset=utf-8"
@@ -51,7 +53,7 @@ extension ApiEndpoints: Endpoint {
     
     var body: [String: String]? {
         switch self {
-        case .moviePopular, .movieDetail:
+        case .moviesGenres, .moviesList, .movieDetail:
             return nil
         }
     }
