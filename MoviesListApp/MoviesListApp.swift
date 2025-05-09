@@ -9,12 +9,11 @@ import SwiftUI
 import SwiftData
 
 @main
-struct MoviesListAppApp: App {
+struct MoviesListApp: App {
     var body: some Scene {
         WindowGroup {
-            ArticleListView()
+            MoviesListView()
         }
         .modelContainer(for: PopularMovieList.self)
     }
 }
-

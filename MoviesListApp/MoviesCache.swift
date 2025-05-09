@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-class ArticleCache {
+class MoviesCache {
     private let context: ModelContext
 
     init(context: ModelContext) {

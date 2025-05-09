@@ -1,8 +1,7 @@
 import Foundation
 import Combine
 
-class ArticleService {
-
+class MoviesService {
     func fetchArticles(endpoint: Endpoint) -> AnyPublisher<PopularMovieList, Error> {
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()

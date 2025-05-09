@@ -1,21 +1,21 @@
 import SwiftUI
 
-struct ArticleListView: View {
+struct MoviesListView: View {
     @Environment(\.modelContext) private var modelContext
     
     var body: some View {
-        ArticleListContent(repository: ArticleRepository(context: modelContext))
+        MoviesListContent(repository: MoviesRepository(context: modelContext))
     }
 }
 
 
 import SwiftUI
 
-struct ArticleListContent: View {
-    @StateObject private var viewModel: ArticleViewModel
+struct MoviesListContent: View {
+    @StateObject private var viewModel: MoviesViewModel
     
-    init(repository: ArticleRepository) {
-        _viewModel = StateObject(wrappedValue: ArticleViewModel(repository: repository))
+    init(repository: MoviesRepository) {
+        _viewModel = StateObject(wrappedValue: MoviesViewModel(repository: repository))
     }
     
     // Fixed-size columns

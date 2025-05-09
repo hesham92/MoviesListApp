@@ -3,15 +3,15 @@ import Combine
 import SwiftData
 
 @MainActor
-class ArticleViewModel: ObservableObject {
+class MoviesViewModel: ObservableObject {
     @Published var movies: [MovieItem] = []
     @Published var isConnected: Bool = true
 
-    private let repository: ArticleRepository
+    private let repository: MoviesRepository
     private let networkMonitor: NetworkMonitor
     private var cancellables = Set<AnyCancellable>()
 
-    init(repository: ArticleRepository, networkMonitor: NetworkMonitor = NetworkMonitor()) {
+    init(repository: MoviesRepository, networkMonitor: NetworkMonitor = NetworkMonitor()) {
         self.repository = repository
         self.networkMonitor = networkMonitor
     }

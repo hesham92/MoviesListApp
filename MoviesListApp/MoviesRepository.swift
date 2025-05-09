@@ -3,12 +3,15 @@ import Combine
 import SwiftData
 import Network
 
-class ArticleRepository: ObservableObject {
+class MoviesRepository: ObservableObject {
     @Published var movies: [MovieItem] = []
     
-    init(context: ModelContext) {
-        self.service = ArticleService()
-        self.cache = ArticleCache(context: context)
+    init(
+        context: ModelContext,
+        moviesService: MoviesService = MoviesService()
+    ) {
+        self.cache = MoviesCache(context: context)
+        self.service = moviesService
         self.context = context
     }
     
@@ -65,8 +68,8 @@ class ArticleRepository: ObservableObject {
     private var canLoadMore = true
     private var cancellables = Set<AnyCancellable>()
     
-    private let service: ArticleService
-    private let cache: ArticleCache
+    private let service: MoviesService
+    private let cache: MoviesCache
     private let context: ModelContext
 }
 
