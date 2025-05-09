@@ -5,23 +5,33 @@ import SwiftData
 @MainActor
 class ArticleViewModel: ObservableObject {
     @Published var movies: [MovieItem] = []
+    @Published var isConnected: Bool = true
 
     private let repository: ArticleRepository
+    private let networkMonitor: NetworkMonitor
     private var cancellables = Set<AnyCancellable>()
 
-    init(repository: ArticleRepository) {
+    init(repository: ArticleRepository, networkMonitor: NetworkMonitor = NetworkMonitor()) {
         self.repository = repository
+        self.networkMonitor = networkMonitor
+    }
 
+    func viewDidAppear() {
+        networkMonitor.$isConnected
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                self?.isConnected = status
+                self?.loadNextPage()
+            }
+            .store(in: &cancellables)
+        
+        
+        // Subscribe to the repository's publisher
         repository.$movies
             .receive(on: DispatchQueue.main)
             .assign(to: &$movies)
     }
-    
-    func configure() {
-        // Configure the repository and load the first page of articles
-        repository.configure() // Now this triggers the loading logic
-    }
-    
+
     func loadNextPage() {
         repository.loadNextPage()
     }

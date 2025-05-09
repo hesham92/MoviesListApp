@@ -76,7 +76,7 @@ struct ArticleListContent: View {
         }
         .background(Color(UIColor.black))
         .onAppear {
-            viewModel.configure() // Trigger the loading of the first page when the view appears
+            viewModel.viewDidAppear() // Trigger the loading of the first page when the view appears
         }
     }
 }

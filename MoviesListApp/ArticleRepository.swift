@@ -10,15 +10,10 @@ class ArticleRepository: ObservableObject {
         self.service = ArticleService()
         self.cache = ArticleCache(context: context)
         self.context = context
-        self.monitor = NWPathMonitor()
-    }
-
-    func configure() {
-        startMonitoring()
     }
     
     func loadNextPage() {
-        guard canLoadMore && !isOffline else { return }
+        guard canLoadMore else { return }
 
         service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: currentPage))
             .receive(on: DispatchQueue.main)
@@ -64,30 +59,6 @@ class ArticleRepository: ObservableObject {
             completion(data)
         }.resume()
     }
-
-    private func startMonitoring() {
-        monitor.pathUpdateHandler = { [weak self] path in
-            guard let self else { return }
-            
-            isOffline = path.status != .satisfied
-        }
-        
-        monitor.start(queue: monitorQueue)
-    }
-    
-    private var isOffline = true {
-        didSet {
-            if isOffline {
-                if movies.isEmpty {
-                    if let cachedList = self.cache.load() {
-                        self.movies = cachedList.results
-                    }
-                }
-            } else {
-                loadNextPage()
-            }
-        }
-    }
     
     private var currentPage = 1
     private var isLoading = false
@@ -97,7 +68,5 @@ class ArticleRepository: ObservableObject {
     private let service: ArticleService
     private let cache: ArticleCache
     private let context: ModelContext
-    private let monitor: NWPathMonitor
-    private let monitorQueue = DispatchQueue(label: "NetworkMonitor")
 }
 
