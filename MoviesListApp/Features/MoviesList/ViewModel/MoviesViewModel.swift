@@ -11,8 +11,11 @@ class MoviesViewModel: ObservableObject {
     private let networkMonitor: NetworkMonitor
     private var cancellables = Set<AnyCancellable>()
 
-    init(repository: MoviesRepository, networkMonitor: NetworkMonitor = NetworkMonitor()) {
-        self.repository = repository
+    init(
+        context: ModelContext,
+        networkMonitor: NetworkMonitor = NetworkMonitor()
+    ) {
+        self.repository = MoviesRepository(context: context)
         self.networkMonitor = networkMonitor
     }
 

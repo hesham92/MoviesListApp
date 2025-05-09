@@ -10,9 +10,8 @@ class MoviesRepository: ObservableObject {
         context: ModelContext,
         moviesService: MoviesService = MoviesService()
     ) {
-        self.cache = MoviesCache(context: context)
+        self.cache = MoviesCache(modelContext: context)
         self.service = moviesService
-        self.context = context
     }
     
     func loadNextPage() {
@@ -34,7 +33,6 @@ class MoviesRepository: ObservableObject {
                     }
 
                     self.movies.append(contentsOf: response.results)
-                    try? self.context.save()
                     self.currentPage += 1
 
                     downloadImages(results: response.results)
@@ -45,10 +43,8 @@ class MoviesRepository: ObservableObject {
 
     private func downloadImages(results: [MovieItem]) {
         for item in results {
-            self.downloadImage(for: item) { [weak self] imageData in
-                guard let self = self else { return }
+            self.downloadImage(for: item) { imageData in
                 item.imageData = imageData
-                try? self.context.save()
             }
         }
     }
@@ -70,6 +66,5 @@ class MoviesRepository: ObservableObject {
     
     private let service: MoviesService
     private let cache: MoviesCache
-    private let context: ModelContext
 }
 

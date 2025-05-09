@@ -14,6 +14,6 @@ struct MoviesListApp: App {
         WindowGroup {
             MoviesListView()
         }
-        .modelContainer(for: PopularMovieList.self)
+        .modelContainer(for: MovieItem.self)
     }
 }

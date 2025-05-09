@@ -1,7 +1,6 @@
 import SwiftData
 import Foundation
 
-@Model
 class PopularMovieList: Identifiable, Codable {
     var id: UUID = UUID()
     var page: Int

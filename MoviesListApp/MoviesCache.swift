@@ -1,29 +1,30 @@
-import Foundation
 import SwiftData
+import SwiftUI
 
 class MoviesCache {
-    private let context: ModelContext
-
-    init(context: ModelContext) {
-        self.context = context
+    @Query
+    private var movieList: [MovieItem]
+    let modelContext: ModelContext
+    
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
     }
 
-    func save(_ movieList: PopularMovieList) {
-        let descriptor = FetchDescriptor<PopularMovieList>()
-        if let existingLists = try? context.fetch(descriptor) {
-            for list in existingLists {
-                context.delete(list)
-            }
+    func save(_ items: [MovieItem]) {
+        // Insert the entire array of MovieItems into the model context
+        for item in items {
+            modelContext.insert(item)  // Insert each MovieItem into the context
         }
-
-        // Insert the new movie list (which includes its movie items)
-        context.insert(movieList)
-
-        try? context.save()
+        
+        // Optionally, commit the changes to the persistent store
+        do {
+            try modelContext.save()  // Ensure the changes are saved
+        } catch {
+            print("Error saving items: \(error)")
+        }
     }
 
-    func load() -> PopularMovieList? {
-        let descriptor = FetchDescriptor<PopularMovieList>()
-        return try? context.fetch(descriptor).first
+    func load() -> [MovieItem] {
+        return movieList
     }
 }
