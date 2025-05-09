@@ -5,6 +5,7 @@ import Network
 
 class MoviesRepository: ObservableObject {
     @Published var movies: [MovieItem] = []
+    @Published var totalPages: Int = 0
     
     init(
         context: ModelContext,
@@ -14,15 +15,13 @@ class MoviesRepository: ObservableObject {
         self.service = moviesService
     }
     
-    func loadData(isOnline: Bool) {
+    func loadMoviesListData(page: Int, isOnline: Bool) {
         guard isOnline else {
             movies = cache.load()
             return
         }
 
-        guard canLoadMore else { return }
-
-        service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: currentPage))
+        service.fetchArticles(endpoint: ApiEndpoints.moviePopular(page: page))
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { completion in
@@ -33,13 +32,9 @@ class MoviesRepository: ObservableObject {
                 receiveValue: { [weak self] response in
                     guard let self else { return }
 
-                    if response.totalPages <= self.currentPage {
-                        self.canLoadMore = false
-                    }
-
-                    self.movies.append(contentsOf: response.results)
+                    movies.append(contentsOf: response.results)
+                    totalPages = response.totalPages
                   //  cache.save(response.results)
-                    self.currentPage += 1
 
                     downloadImages(results: response.results)
                 }
@@ -65,12 +60,9 @@ class MoviesRepository: ObservableObject {
         }.resume()
     }
     
-    private var currentPage = 1
-    private var isLoading = false
-    private var canLoadMore = true
-    private var cancellables = Set<AnyCancellable>()
     
     private let service: MoviesService
     private let cache: MoviesCache
+    private var cancellables = Set<AnyCancellable>()
 }
 

@@ -6,6 +6,8 @@ import SwiftData
 class MoviesViewModel: ObservableObject {
     @Published var movies: [MovieItem] = []
     @Published var isConnected: Bool = true
+    private var totalPages = 1
+    private var currentPage = 0
 
     private let repository: MoviesRepository
     private let networkMonitor: NetworkMonitor
@@ -34,11 +36,22 @@ class MoviesViewModel: ObservableObject {
         // Subscribe to the repository's publisher
         repository.$movies
             .receive(on: DispatchQueue.main)
-            .assign(to: &$movies)
+            .sink { [weak self] data in
+                guard let self else { return }
+                
+                movies = data
+                currentPage += 1
+            }
+            .store(in: &cancellables)
+        
+        repository.$totalPages
+            .assign(to: \.totalPages, on: self)
+            .store(in: &cancellables)
     }
 
     func loadData() {
-        repository.loadData(isOnline: isConnected)
+        guard currentPage <= totalPages else { return }
+        
+        repository.loadMoviesListData(page: 1, isOnline: isConnected)
     }
 }
-
