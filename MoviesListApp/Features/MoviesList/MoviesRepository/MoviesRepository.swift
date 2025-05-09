@@ -5,7 +5,7 @@ import Network
 
 class MoviesRepository: ObservableObject {
     @Published var movies: [MovieItem] = []
-    @Published var totalPages: Int = 0
+    @Published var totalPages: Int = 2
     
     init(
         context: ModelContext,

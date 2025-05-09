@@ -28,24 +28,21 @@ struct MoviesListContent: View {
                 ForEach(viewModel.movies.indices, id: \.self) { index in
                     let item = viewModel.movies[index]
                     VStack(alignment: .leading, spacing: 8) {
-                        AsyncImage(url: URL(string: "https://image.tmdb.org/t/p/w500" + item.posterPath)) { asyncImagePhase in
-                            ZStack {
-                                // Always show gray background as placeholder
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.3))
+                        ZStack {
+                            // Always show gray background as placeholder
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(height: 140)
+                                .cornerRadius(8)
+                            
+                            if let data = item.imageData,
+                               let uiImage = UIImage(data: data) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
                                     .frame(height: 140)
+                                    .clipped()
                                     .cornerRadius(8)
-                                
-                                if let data = item.imageData,
-                                   let uiImage = UIImage(data: data) {
-                                    Image(uiImage: uiImage)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 140)
-                                        .clipped()
-                                        .cornerRadius(8)
-                                }
-                                
                             }
                         }
                         

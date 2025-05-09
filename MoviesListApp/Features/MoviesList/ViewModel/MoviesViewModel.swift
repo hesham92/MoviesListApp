@@ -19,7 +19,7 @@ class MoviesListViewModel: ObservableObject {
     func loadData() {
         guard currentPage <= totalPages else { return }
         
-        repository.loadMoviesListData(page: 1, isOnline: isConnected)
+        repository.loadMoviesListData(page: currentPage, isOnline: isConnected)
     }
     
     private func bindPublishers() {
@@ -52,8 +52,8 @@ class MoviesListViewModel: ObservableObject {
     
     @Published var movies: [MovieItem] = []
     @Published var isConnected: Bool = true
-    private var totalPages = 1
-    private var currentPage = 0
+    private var totalPages = 2
+    private var currentPage = 1
 
     private let repository: MoviesRepository
     private let networkMonitor: NetworkMonitor
