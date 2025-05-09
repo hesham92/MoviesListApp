@@ -3,11 +3,11 @@ import SwiftUI
 struct MovieDetailsView: View {
     @ObservedObject private var viewModel: MovieDetailsViewModel
     @Environment(Router.self) var router
-    
+
     init(movieId: Int) {
         _viewModel = ObservedObject(wrappedValue: MovieDetailsViewModel(movieId: movieId))
     }
-    
+
     var body: some View {
         ScrollView {
             if viewModel.isLoading {
@@ -16,94 +16,72 @@ struct MovieDetailsView: View {
             } else if let error = viewModel.errorMessage {
                 VStack(spacing: 16) {
                     Text("Error: \(error)")
-                        .foregroundColor(.red)  // Error message in red
+                        .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                     Button("Retry") {
                         viewModel.loadData()
                     }
                 }
                 .padding()
-            } else if let movie = viewModel.movie {
+            } else if let _ = viewModel.movie {
                 VStack(alignment: .leading, spacing: 4) {
                     // Poster Image
-                    MovieImage(path: movie.posterPath)
-                    
+                    if let poster = viewModel.posterPath {
+                        MovieImage(path: poster)
+                    }
+
                     HStack(alignment: .top) {
-                        MovieImage(path: movie.posterPath)
-                            .frame(width: 50, height: 100)
-                            .padding(.all, 8)
-                        
+                        if let poster = viewModel.posterPath {
+                            MovieImage(path: poster)
+                                .frame(width: 50, height: 100)
+                                .padding(.all, 8)
+                        }
+
                         VStack(alignment: .leading) {
-                            Text("\(movie.title) (\(movie.releaseDate))")
+                            Text(viewModel.formattedTitle)
                                 .font(.system(size: 16, weight: .bold))
-                            
-                            if !movie.genres.isEmpty {
-                                Text(movie.genres.map { $0.name }.joined(separator: ", "))
+
+                            if !viewModel.formattedGenres.isEmpty {
+                                Text(viewModel.formattedGenres)
                             }
                         }
                         .padding(.top, 10)
                     }
-                    
-                    
-                    Text(movie.overview)
+
+                    Text(viewModel.overviewText)
                         .font(.system(size: 14))
-                    
+
                     Spacer(minLength: 30)
-                    
-                    if let homepage = movie.homepage {
+
+                    if let homepage = viewModel.homepageText {
                         HStack {
-                            Text("Homepage:")
-                                .bold()
-                                .foregroundColor(.white)
                             Text(homepage)
                                 .underline()
                                 .foregroundColor(.blue)
                         }
                     }
-                    
-                    if !movie.spokenLanguages.isEmpty {
+
+                    if let languages = viewModel.languagesText {
                         HStack {
-                            Text("Languages:")
-                                .bold()
-                            Text(movie.spokenLanguages.map { $0.name }.joined(separator: ", "))
+                            Text(languages)
                         }
                     }
-                    
+
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            HStack {
-                                Text("Budget:")
-                                    .bold()
-                                Text(movie.budget.formatted(.currency(code: "USD")))
-                            }
-                            
-                            HStack {
-                                Text("Status:")
-                                    .bold()
-                                Text(movie.status)
-                            }
+                            Text(viewModel.budgetText)
+                            Text(viewModel.statusText)
                         }
-                        
+
                         Spacer()
-                        
+
                         VStack(alignment: .leading, spacing: 2) {
-                            if let runtime = movie.runtime {
-                                HStack {
-                                    Text("Runtime:")
-                                        .bold()
-                                    Text("\(runtime) minutes")
-                                }
-                            }
-                                                        
-                            HStack {
-                                Text("Revenue:")
-                                    .bold()
-                                Text(movie.revenue.formatted(.currency(code: "USD")))
-                            }
+                            Text(viewModel.runtimeText)
+                            Text(viewModel.revenueText)
                         }
                     }
                 }
-                .font(.system(size: 12)) // Custom small font size
+                .font(.system(size: 12))
                 .padding(.all, 8)
             } else {
                 Text("No movie data available.")
@@ -113,25 +91,23 @@ struct MovieDetailsView: View {
         .onAppear {
             viewModel.viewDidAppear()
         }
-        .navigationBarHidden(true)  // Hides the default navigation bar
-        .background(Color.black)  // Set background to black
-        .foregroundColor(.white)  // Set all text to white
-        .overlay(
-            customBackButton, alignment: .topLeading  // Add custom back button on top left
-        )
+        .navigationBarHidden(true)
+        .background(Color.black)
+        .foregroundColor(.white)
+        .overlay(customBackButton, alignment: .topLeading)
     }
-    
+
     private var customBackButton: some View {
         Button(action: {
             router.popToRoot()
         }) {
             Image(systemName: "chevron.left")
-                .foregroundColor(.white)  // White color
-                .font(.system(size: 20))  // Smaller size
+                .foregroundColor(.white)
+                .font(.system(size: 20))
                 .padding()
         }
-        .padding(.top, 16)  // Padding from the top to avoid it being too close to the edge
-        .padding(.leading, 16)  // Padding from the left
+        .padding(.top, 16)
+        .padding(.leading, 16)
     }
 }
 
