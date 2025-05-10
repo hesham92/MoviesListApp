@@ -3,124 +3,177 @@ import SwiftUI
 struct MovieDetailsView: View {
     @ObservedObject private var viewModel: MovieDetailsViewModel
     @Environment(Router.self) var router
-
+    
     init(movieId: Int) {
         _viewModel = ObservedObject(wrappedValue: MovieDetailsViewModel(movieId: movieId))
     }
 
     var body: some View {
         ScrollView {
-            if viewModel.isLoading {
-                // Loading Indicator
-                ProgressView("Loading...")
-                    .padding()
-            } else if let error = viewModel.errorMessage {
-                // Error State
-                VStack(spacing: 16) {
-                    Text("Error: \(error)")
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                    
-                    Button("Retry") {
-                        viewModel.loadData()
-                    }
-                }
-                .padding()
-            } else if let _ = viewModel.movie {
-                // Movie Content
-                VStack(alignment: .leading, spacing: 8) {
-
-                    // Poster Image (Full Width)
-                    if let poster = viewModel.posterPath {
-                        MovieImage(path: poster)
-                    }
-
-                    // Title & Genres with Poster Thumbnail
-                    HStack(alignment: .top) {
-                        if let poster = viewModel.posterPath {
-                            MovieImage(path: poster)
-                                .frame(width: 50, height: 100)
-                                .padding(8)
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(viewModel.formattedTitle)
-                                .font(.system(size: 16, weight: .bold))
-                            
-                            if !viewModel.formattedGenres.isEmpty {
-                                Text(viewModel.formattedGenres)
-                            }
-                        }
-                        .padding(.top, 10)
-                    }
-
-                    // Overview
-                    Text(viewModel.overviewText)
-                        .font(.system(size: 14))
-                        .padding(.vertical, 8)
-
-                    // Optional Homepage Link
-                    if let homepage = viewModel.homepageText {
-                        HStack {
-                            Text(homepage)
-                                .underline()
-                                .foregroundColor(.blue)
-                        }
-                        .padding(.vertical, 4)
-                    }
-
-                    // Optional Languages
-                    if let languages = viewModel.languagesText {
-                        HStack {
-                            Text(languages)
-                        }
-                        .padding(.vertical, 4)
-                    }
-
-                    // Financial and Status Info
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(viewModel.budgetText)
-                            Text(viewModel.statusText)
-                        }
-
-                        Spacer()
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(viewModel.runtimeText)
-                            Text(viewModel.revenueText)
-                        }
-                    }
-                    .padding(.top, 8)
-                }
-                .font(.system(size: 12))
-                .padding(8)
-            } else {
-                // Fallback if no data
-                Text("No movie data available.")
-                    .padding()
-            }
+            content
         }
-        .onAppear {
-            viewModel.viewDidAppear()
-        }
+        .onAppear { viewModel.loadData() }
         .navigationBarHidden(true)
-        .background(Color.black)
-        .foregroundColor(.white)
+        .background(Color.movieBackground)
+        .foregroundColor(.movieText)
         .overlay(customBackButton, alignment: .topLeading)
     }
-
-    // Custom back button overlay
+    
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.state {
+        case .loading:
+            LoadingView(isLoading: true)
+        case .error(let msg):
+            ErrorView(message: msg, retryAction: viewModel.loadData)
+        case .loaded:
+            MovieContentView(viewModel: viewModel)  // Pass the entire viewModel here
+        case .empty:
+            Text("No movie data available.")
+                .padding()
+        }
+    }
+    
     private var customBackButton: some View {
         Button(action: {
             router.popToRoot()
         }) {
             Image(systemName: "chevron.left")
-                .foregroundColor(.white)
+                .foregroundColor(.movieText)
                 .font(.system(size: 20))
                 .padding()
         }
         .padding(.top, 16)
         .padding(.leading, 16)
+    }
+}
+
+
+
+extension Font {
+    static let movieTitle = Font.system(size: 16, weight: .bold)
+    static let movieBody = Font.system(size: 14)
+}
+
+extension Color {
+    static let movieBackground = Color.black
+    static let movieText = Color.white
+    static let movieAccent = Color.blue
+}
+
+
+
+struct ErrorView: View {
+    let message: String
+    let retryAction: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Error: \(message)")
+                .foregroundColor(.red)
+                .multilineTextAlignment(.center)
+            Button("Retry", action: retryAction)
+                .padding()
+                .background(Color.movieAccent)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+        }
+        .padding()
+    }
+}
+
+
+
+struct MovieStatsView: View {
+    let budget: String
+    let status: String
+    let runtime: String
+    let revenue: String
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(budget)
+                Text(status)
+            }
+
+            Spacer()
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(runtime)
+                Text(revenue)
+            }
+        }
+        .padding(.top, 8)
+    }
+}
+
+
+struct MovieHeaderView: View {
+    let posterPath: String?
+    let title: String
+    let genres: String
+
+    var body: some View {
+        HStack(alignment: .top) {
+            if let poster = posterPath {
+                MovieImage(path: poster)
+                    .frame(width: 50, height: 100)
+                    .padding(8)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.movieTitle)
+
+                if !genres.isEmpty {
+                    Text(genres)
+                }
+            }
+            .padding(.top, 10)
+        }
+    }
+}
+
+
+struct MovieContentView: View {
+    @ObservedObject var viewModel: MovieDetailsViewModel
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let poster = viewModel.posterPath {
+                MovieImage(path: poster)
+            }
+
+            MovieHeaderView(
+                posterPath: viewModel.posterPath,
+                title: viewModel.formattedTitle,
+                genres: viewModel.formattedGenres
+            )
+
+            Text(viewModel.overviewText)
+                .font(.movieBody)
+                .padding(.vertical, 8)
+
+            if let homepage = viewModel.homepageText {
+                Text(homepage)
+                    .underline()
+                    .foregroundColor(.movieAccent)
+                    .padding(.vertical, 4)
+            }
+
+            if let languages = viewModel.languagesText {
+                Text(languages)
+                    .padding(.vertical, 4)
+            }
+
+            MovieStatsView(
+                budget: viewModel.budgetText,
+                status: viewModel.statusText,
+                runtime: viewModel.runtimeText,
+                revenue: viewModel.revenueText
+            )
+        }
+        .font(.movieBody)
+        .padding(8)
     }
 }

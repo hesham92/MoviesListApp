@@ -3,9 +3,14 @@ import Combine
 
 @MainActor
 class MovieDetailsViewModel: ObservableObject {
-    @Published var movie: MovieItemDetails?
-    @Published var isLoading: Bool = false
-    @Published var errorMessage: String? = nil
+    enum MovieDetailsViewState {
+        case loading
+        case error(String)
+        case loaded(MovieItemDetails)
+        case empty
+    }
+
+    @Published var state: MovieDetailsViewState = .loading
 
     private let repository: MovieDetailsRepository
     private var cancellables = Set<AnyCancellable>()
@@ -15,84 +20,97 @@ class MovieDetailsViewModel: ObservableObject {
     }
 
     func viewDidAppear() {
-        bindPublishers()
         loadData()
     }
 
     func loadData() {
-        isLoading = true
-        errorMessage = nil
+        state = .loading
         repository.loadMovieDetails()
+        bindPublishers()
     }
 
     private func bindPublishers() {
+        // Bind repository to state
         repository.$movie
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] movie in
-                self?.movie = movie
+                if let movie = movie {
+                    self?.state = .loaded(movie)
+                } else {
+                    self?.state = .empty
+                }
             }
             .store(in: &cancellables)
 
         repository.$isLoading
             .receive(on: DispatchQueue.main)
-            .assign(to: \.isLoading, on: self)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.state = .loading
+                }
+            }
             .store(in: &cancellables)
 
         repository.$errorMessage
             .receive(on: DispatchQueue.main)
-            .assign(to: \.errorMessage, on: self)
+            .sink { [weak self] errorMessage in
+                if let errorMessage = errorMessage {
+                    self?.state = .error(errorMessage)
+                }
+            }
             .store(in: &cancellables)
     }
 
-    // MARK: - Preformatted UI Strings
+    // Computed Properties
 
     var formattedTitle: String {
-        guard let movie else { return "" }
+        guard case .loaded(let movie) = state else { return "" }
         return "\(movie.title) (\(movie.releaseDate))"
     }
 
     var formattedGenres: String {
-        guard let movie, !movie.genres.isEmpty else { return "" }
+        guard case .loaded(let movie) = state, !movie.genres.isEmpty else { return "" }
         return movie.genres.map { $0.name }.joined(separator: ", ")
     }
 
     var overviewText: String {
-        movie?.overview ?? ""
+        guard case .loaded(let movie) = state else { return "" }
+        return movie.overview
     }
 
     var posterPath: String? {
-        movie?.posterPath
+        guard case .loaded(let movie) = state else { return nil }
+        return movie.posterPath
     }
 
     var budgetText: String {
-        guard let movie else { return "" }
+        guard case .loaded(let movie) = state else { return "" }
         return "Budget: \(movie.budget.formatted(.currency(code: "USD")))"
     }
 
     var statusText: String {
-        guard let movie else { return "" }
+        guard case .loaded(let movie) = state else { return "" }
         return "Status: \(movie.status)"
     }
 
     var runtimeText: String {
-        guard let runtime = movie?.runtime else { return "" }
-        return "Runtime: \(runtime) minutes"
+        guard case .loaded(let movie) = state else { return "" }
+        return "Runtime: \(movie.runtime) minutes"
     }
 
     var revenueText: String {
-        guard let movie else { return "" }
+        guard case .loaded(let movie) = state else { return "" }
         return "Revenue: \(movie.revenue.formatted(.currency(code: "USD")))"
     }
 
     var homepageText: String? {
-        guard let homepage = movie?.homepage else { return nil }
-        return "Homepage: \(homepage)"
+        guard case .loaded(let movie) = state else { return nil }
+        return "Homepage: \(movie.homepage)"
     }
 
     var languagesText: String? {
-        guard let movie, !movie.spokenLanguages.isEmpty else { return nil }
+        guard case .loaded(let movie) = state, !movie.spokenLanguages.isEmpty else { return nil }
         return "Languages: \(movie.spokenLanguages.map { $0.name }.joined(separator: ", "))"
     }
 }
-
