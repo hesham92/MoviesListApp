@@ -47,7 +47,6 @@ struct MovieContentView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(viewModel.overviewText)
-                .font(.movieBody)
                 .padding(.vertical, 8)
             
             Text(viewModel.homepageText)
@@ -59,6 +58,7 @@ struct MovieContentView: View {
             Text(viewModel.languagesText)
                 .padding(.vertical, 4)
         }
+        .font(.movieBody)
         
         HStack {
             VStack(alignment: .leading, spacing: 2) {
@@ -73,6 +73,7 @@ struct MovieContentView: View {
                 Text(viewModel.revenueText)
             }
         }
+        .font(.movieBody)
         .padding(.top, 8)
     }
 }

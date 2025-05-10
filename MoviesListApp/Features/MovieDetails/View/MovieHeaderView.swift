@@ -32,7 +32,7 @@ struct MovieHeaderView: View {
         HStack(alignment: .top) {
             MovieImage(path: viewModel.posterPath)
                 .frame(width: 50, height: 100)
-                .padding(8)
+                .padding(.horizontal, 8)
             
             
             VStack(alignment: .leading, spacing: 4) {

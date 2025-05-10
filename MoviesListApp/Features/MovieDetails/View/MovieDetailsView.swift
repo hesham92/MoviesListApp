@@ -21,6 +21,7 @@ struct MovieDetailsView: View {
     
     @ViewBuilder
     private var content: some View {
+       
         switch viewModel.state {
         case .loading:
             LoadingView(isLoading: true)
@@ -29,18 +30,21 @@ struct MovieDetailsView: View {
             ErrorView(message: msg, retryAction: viewModel.loadData)
             
         case .loaded(let sections):
-            ForEach(sections, id: \.self) { section in
-                switch section {
-                case .poster(let path):
-                    MovieImage(path: path)
-                    
-                case .header(let movieDetailsHeaderViewPresentation):
-                    MovieHeaderView(viewModel: movieDetailsHeaderViewPresentation)
-                    
-                case .content(let movieDetailsContentViewPresentation):
-                    MovieContentView(viewModel: movieDetailsContentViewPresentation)
+            VStack(alignment: .leading) {
+                ForEach(sections, id: \.self) { section in
+                    switch section {
+                    case .poster(let path):
+                        MovieImage(path: path)
+                        
+                    case .header(let movieDetailsHeaderViewPresentation):
+                        MovieHeaderView(viewModel: movieDetailsHeaderViewPresentation)
+                        
+                    case .content(let movieDetailsContentViewPresentation):
+                        MovieContentView(viewModel: movieDetailsContentViewPresentation)
+                    }
                 }
             }
+            .padding(4)
             
         case .empty:
             Text("No movie data available.")
