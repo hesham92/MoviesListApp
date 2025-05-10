@@ -3,9 +3,10 @@ import SwiftData
 
 @main
 struct MoviesListApp: App {
+    @Environment(\.modelContext) private var context
     var body: some Scene {
         WindowGroup {
-            MoviesListView()
+            MoviesListView(context: context)
                 .withRouter()
         }
         .modelContainer(for: MovieItemDetails.self)
