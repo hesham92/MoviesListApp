@@ -3,7 +3,7 @@ import SwiftData
 import Kingfisher
 
 struct MovieGridItemView: View {
-    let item: MovieItem
+    let item: MovieItemDetails
     @Binding var selectedMovieId: Int?
     @Environment(Router.self) var router
 

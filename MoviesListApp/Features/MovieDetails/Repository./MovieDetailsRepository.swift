@@ -49,4 +49,3 @@ class MovieDetailsRepository: ObservableObject {
     private let networkClient: NetworkClient
     private var cancellables = Set<AnyCancellable>()
 }
-

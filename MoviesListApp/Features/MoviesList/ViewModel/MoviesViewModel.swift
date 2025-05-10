@@ -86,8 +86,8 @@ class MoviesListViewModel: ObservableObject {
         }
     }
     
-    var filteredMovies: [MovieItem] = []
-    @Published var movies: [MovieItem] = []
+    var filteredMovies: [MovieItemDetails] = []
+    @Published var movies: [MovieItemDetails] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
     @Published private var isConnected: Bool = true
