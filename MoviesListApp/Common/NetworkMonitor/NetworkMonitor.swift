@@ -1,7 +1,16 @@
 import Network
 import Combine
 
-class NetworkMonitor: ObservableObject {
+protocol NetworkMonitor {
+    var isConnected: Bool { get }
+    var isConnectedPublisher: any Publisher<Bool, Never> { get }
+}
+
+class NetworkMonitorImpl: NetworkMonitor, ObservableObject {
+    var isConnectedPublisher: any Publisher<Bool, Never> {
+        $isConnected
+    }
+    
     @Published var isConnected: Bool = false
 
     private let monitor = NWPathMonitor()

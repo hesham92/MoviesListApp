@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		548224792DCFA58E0034A1CC /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 548224782DCFA58E0034A1CC /* Factory */; };
 		5482E6282DCEFF220034A1CC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5482E6272DCEFF220034A1CC /* Kingfisher */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +58,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5482E6282DCEFF220034A1CC /* Kingfisher in Frameworks */,
+				548224792DCFA58E0034A1CC /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -126,6 +128,7 @@
 			name = MoviesListApp;
 			packageProductDependencies = (
 				5482E6272DCEFF220034A1CC /* Kingfisher */,
+				548224782DCFA58E0034A1CC /* Factory */,
 			);
 			productName = MoviesListApp;
 			productReference = 547D93322DCCA3E30052BD30 /* MoviesListApp.app */;
@@ -211,6 +214,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				54F3641E2DCEFE5A002AA25C /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				548224772DCFA57E0034A1CC /* XCRemoteSwiftPackageReference "Factory" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 547D93332DCCA3E30052BD30 /* Products */;
@@ -571,6 +575,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		548224772DCFA57E0034A1CC /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.3;
+			};
+		};
 		54F3641E2DCEFE5A002AA25C /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
@@ -582,6 +594,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		548224782DCFA58E0034A1CC /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 548224772DCFA57E0034A1CC /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
 		5482E6272DCEFF220034A1CC /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 54F3641E2DCEFE5A002AA25C /* XCRemoteSwiftPackageReference "Kingfisher" */;

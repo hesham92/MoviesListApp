@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftData
+import Factory
 
 @MainActor
 class MoviesListViewModel: ObservableObject {
@@ -35,14 +36,9 @@ class MoviesListViewModel: ObservableObject {
     @Published var movieItems: [MovieItemViewPresentation] = []
 
     private var totalPages = 10
-    private let repository: MoviesListRepository
     private var cancellables = Set<AnyCancellable>()
-
-    init(
-        context: ModelContext
-    ) {
-        self.repository = MoviesListRepository(context: context)
-    }
+    
+    @Injected(\.moviesListRepository) private var repository
 
     func viewDidAppear() {
         bindPublishers()

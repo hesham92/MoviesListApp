@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftData
+import Factory
 
 class MovieDetailsViewModel: ObservableObject {
     enum MovieItemDetailsSection: Hashable {
@@ -19,12 +20,8 @@ class MovieDetailsViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(
-        movieItemId: Int,
-        context: ModelContext
-    ) {
+    init(movieItemId: Int) {
         self.movieItemId = movieItemId
-        self.repository = MoviesListRepository(context: context)
     }
 
     func viewDidAppear() {
@@ -56,5 +53,5 @@ class MovieDetailsViewModel: ObservableObject {
     }
     
     private let movieItemId: Int
-    private let repository: MoviesListRepository
+    @Injected(\.moviesListRepository) private var repository
 }

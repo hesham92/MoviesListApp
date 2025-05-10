@@ -1,28 +1,19 @@
 import SwiftData
 import SwiftUI
 
-class MoviesCache {
+protocol MoviesCache {
+    func save(_ items: [MovieItem])
+    func load() -> [MovieItem]
+}
+
+class MoviesCacheImpl: MoviesCache {
     let modelContext: ModelContext
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
 
-    func clearCache() {
-        let descriptor = FetchDescriptor<MovieItem>()
-        do {
-            let allItems = try modelContext.fetch(descriptor)
-            for item in allItems {
-                modelContext.delete(item)
-            }
-            try modelContext.save()
-        } catch {
-            print("Error clearing cache: \(error)")
-        }
-    }
-
     func save(_ items: [MovieItem]) {
-      //  clearCache()  // Clear existing items before saving new ones
         for item in items {
             modelContext.insert(item)
         }

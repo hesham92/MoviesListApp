@@ -5,8 +5,8 @@ struct MovieDetailsView: View {
     @Environment(Router.self) var router
     @StateObject private var viewModel: MovieDetailsViewModel
     
-    init(movieItemId: Int, context: ModelContext) {
-        _viewModel = StateObject(wrappedValue: MovieDetailsViewModel(movieItemId: movieItemId, context: context))
+    init(movieItemId: Int) {
+        _viewModel = StateObject(wrappedValue: MovieDetailsViewModel(movieItemId: movieItemId))
     }
 
     var body: some View {

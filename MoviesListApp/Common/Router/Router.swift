@@ -26,13 +26,12 @@ extension View {
 }
 
 struct RouterViewModifier: ViewModifier {
-    @Environment(\.modelContext) private var context
     @State private var router = Router()
     private func routeView(for route: Route) -> some View {
         Group {
             switch route {
             case let .movieItemDetails(movieItemId):
-                MovieDetailsView(movieItemId: movieItemId, context: context)
+                MovieDetailsView(movieItemId: movieItemId)
             }
         }
         .environment(router)

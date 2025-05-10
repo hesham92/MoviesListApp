@@ -2,39 +2,37 @@ import Foundation
 import Combine
 import SwiftData
 import Network
+import Factory
 
-class MoviesListRepository: ObservableObject {
-    private let networkClient: NetworkClient
-    private let networkMonitor: NetworkMonitor
-    private let cache: MoviesCache
-    
-    init(
-        context: ModelContext,
-        networkClient: NetworkClient = NetworkClient(),
-        networkMonitor: NetworkMonitor = NetworkMonitor()
-    ) {
-        self.cache = MoviesCache(modelContext: context)
-        self.networkClient = networkClient
-        self.networkMonitor = networkMonitor
-    }
-    
-    func loadMoviesListData(page: Int) -> some Publisher<MovieItemListResponse, Error> {
+protocol MoviesListRepository {
+    func loadMoviesListData(page: Int) -> AnyPublisher<MovieItemListResponse, Error>
+    func fetchMovieDetails(for id: Int) -> AnyPublisher<MovieItemDetails, Error>
+}
+
+class MoviesListRepositoryImpl: MoviesListRepository {
+    func loadMoviesListData(page: Int) -> AnyPublisher<MovieItemListResponse, Error> {
         Just(cache.load()).map {
-            MovieItemListResponse(page: page, totalResults: 0, totalPages: 100, results: $0)
+            MovieItemListResponse(totalPages: 100, results: $0)
         }
         .setFailureType(to: Error.self)
-        .merge(with: networkMonitor.$isConnected.removeDuplicates().flatMap { [weak self] isConnected in
+        .merge(with: networkMonitor.isConnectedPublisher.eraseToAnyPublisher().removeDuplicates().flatMap { [weak self] isConnected in
             guard let self, isConnected else { return Empty<MovieItemListResponse, Error>().eraseToAnyPublisher() }
             
             return networkClient.getData(endpoint: ApiEndpoints.moviesList(page: page))
                 .map{ [weak self] (response: MovieItemListResponse) in
                     self?.cache.save(response.results)
                     return response
-                }.eraseToAnyPublisher()
+                }
+                .eraseToAnyPublisher()
         })
+        .eraseToAnyPublisher()
     }
 
-    func fetchMovieDetails(for id: Int) -> some Publisher<MovieItemDetails, Error> {
+    func fetchMovieDetails(for id: Int) -> AnyPublisher<MovieItemDetails, Error> {
         networkClient.getData(endpoint: ApiEndpoints.movieDetail(id: id))
     }
+    
+    @Injected(\.networkClient) private var networkClient
+    @Injected(\.networkMonitor) private var networkMonitor
+    @Injected(\.moviesCache) private var cache
 }

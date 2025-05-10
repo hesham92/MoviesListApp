@@ -1,7 +1,11 @@
 import Foundation
 import Combine
 
-class NetworkClient {
+protocol NetworkClient {
+    func getData<T: Decodable>(endpoint: Endpoint) -> AnyPublisher<T, Error>
+}
+
+class NetworkClientImpl: NetworkClient {
     func getData<T: Decodable>(endpoint: Endpoint) -> AnyPublisher<T, Error> {
         guard let url = URL(string: endpoint.baseURL + endpoint.path) else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()

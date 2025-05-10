@@ -3,7 +3,7 @@ import SwiftData
 
 struct MoviesListView: View {
     @Environment(Router.self) private var router
-    @StateObject private var viewModel: MoviesListViewModel
+    @StateObject private var viewModel: MoviesListViewModel = MoviesListViewModel()
 
     private let columns = [
         GridItem(.flexible()),
@@ -15,11 +15,6 @@ struct MoviesListView: View {
         "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery",
         "Romance", "Science Fiction", "TV Movie", "Thriller", "War", "Western"
     ]
-
-    // Custom initializer to pass ModelContext to the ViewModel
-    init(context: ModelContext) {
-        _viewModel = StateObject(wrappedValue: MoviesListViewModel(context: context))
-    }
 
     var body: some View {
         ZStack {
