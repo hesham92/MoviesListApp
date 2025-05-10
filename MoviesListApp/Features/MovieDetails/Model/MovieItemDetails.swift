@@ -7,7 +7,7 @@ class MovieItemDetails: Identifiable, Codable {
     var overview: String
     var releaseDate: String
     var posterPath: String
-    var homepage: String?
+    var homepage: String
     var budget: Int
     var revenue: Int
     var runtime: Int
@@ -63,6 +63,35 @@ struct SpokenLanguage: Codable {
     enum CodingKeys: String, CodingKey {
         case englishName = "english_name"
         case name
+    }
+}
+
+extension MovieItemDetails: Equatable {
+    static func == (lhs: MovieItemDetails, rhs: MovieItemDetails) -> Bool {
+        return lhs.id == rhs.id &&
+            lhs.title == rhs.title &&
+            lhs.overview == rhs.overview &&
+            lhs.releaseDate == rhs.releaseDate &&
+            lhs.posterPath == rhs.posterPath &&
+            lhs.homepage == rhs.homepage &&
+            lhs.budget == rhs.budget &&
+            lhs.revenue == rhs.revenue &&
+            lhs.runtime == rhs.runtime &&
+            lhs.status == rhs.status &&
+            lhs.genres == rhs.genres &&
+            lhs.spokenLanguages == rhs.spokenLanguages
+    }
+}
+
+extension Genre: Equatable {
+    static func == (lhs: Genre, rhs: Genre) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
+    }
+}
+
+extension SpokenLanguage: Equatable {
+    static func == (lhs: SpokenLanguage, rhs: SpokenLanguage) -> Bool {
+        return lhs.englishName == rhs.englishName && lhs.name == rhs.name
     }
 }
 
