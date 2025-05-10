@@ -2,13 +2,14 @@ import Foundation
 import Combine
 import SwiftData
 import Factory
+import OrderedCollections
 
 @MainActor
 class MoviesListViewModel: ObservableObject {
     enum MoviesListViewState: Equatable {
         case loading
         case error(String)
-        case loaded([MovieItemViewPresentation], isLoading: Bool)
+        case loaded(OrderedSet<MovieItemViewPresentation>, isLoading: Bool)
         case empty
         
         var isLoading: Bool {
@@ -33,7 +34,7 @@ class MoviesListViewModel: ObservableObject {
     }
 
     @Published private var currentPage = 1
-    @Published var movieItems: [MovieItemViewPresentation] = []
+    @Published var movieItems: OrderedSet<MovieItemViewPresentation> = []
 
     private var totalPages = 10
     private var cancellables = Set<AnyCancellable>()
@@ -65,7 +66,7 @@ class MoviesListViewModel: ObservableObject {
 
                 switch result {
                 case .success(let response):
-                    self.movieItems += response.results.map { MovieItemViewPresentation(movieItem: $0) }
+                    self.movieItems.append(contentsOf: response.results.map { MovieItemViewPresentation(movieItem: $0) })
                     state = .loaded(movieItems, isLoading: false)
                     
                 case .failure(let error):

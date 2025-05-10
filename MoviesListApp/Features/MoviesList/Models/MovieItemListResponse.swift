@@ -1,7 +1,11 @@
 import SwiftData
 import Foundation
 
-class MovieItemListResponse: Identifiable, Codable {
+class MovieItemListResponse: Identifiable, Codable, Equatable {
+    static func == (lhs: MovieItemListResponse, rhs: MovieItemListResponse) -> Bool {
+        lhs.id == rhs.id
+    }
+    
     var id: UUID = UUID()
     var totalPages: Int
     var results: [MovieItem] = []

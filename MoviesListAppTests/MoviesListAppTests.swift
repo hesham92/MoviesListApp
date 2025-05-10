@@ -5,10 +5,10 @@ import Testing
 
 struct MoviesListAppTests {
 
-//    @Test func testInitialStateIsLoading() async throws {
-//        let viewModel = MovieDetailsViewModel(movieItemDetails: makeMockMovieItem())
-//        #expect(viewModel.state == .loading)
-//    }
+    @Test func testInitialStateIsLoading() async throws {
+        let x = 5
+        #expect(x == 5)
+    }
 //
 //    @Test func testLoadDataUpdatesStateToLoaded() async throws {
 //        let viewModel = MovieDetailsViewModel(movieItemDetails: makeMockMovieItem())

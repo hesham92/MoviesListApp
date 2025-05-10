@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		540A2D3A2DCFBC4B006DB88D /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 540A2D392DCFBC4B006DB88D /* Collections */; };
 		548224792DCFA58E0034A1CC /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 548224782DCFA58E0034A1CC /* Factory */; };
 		5482E6282DCEFF220034A1CC /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 5482E6272DCEFF220034A1CC /* Kingfisher */; };
 /* End PBXBuildFile section */
@@ -57,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				540A2D3A2DCFBC4B006DB88D /* Collections in Frameworks */,
 				5482E6282DCEFF220034A1CC /* Kingfisher in Frameworks */,
 				548224792DCFA58E0034A1CC /* Factory in Frameworks */,
 			);
@@ -129,6 +131,7 @@
 			packageProductDependencies = (
 				5482E6272DCEFF220034A1CC /* Kingfisher */,
 				548224782DCFA58E0034A1CC /* Factory */,
+				540A2D392DCFBC4B006DB88D /* Collections */,
 			);
 			productName = MoviesListApp;
 			productReference = 547D93322DCCA3E30052BD30 /* MoviesListApp.app */;
@@ -215,6 +218,7 @@
 			packageReferences = (
 				54F3641E2DCEFE5A002AA25C /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				548224772DCFA57E0034A1CC /* XCRemoteSwiftPackageReference "Factory" */,
+				540A2D382DCFBC4B006DB88D /* XCRemoteSwiftPackageReference "swift-collections" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 547D93332DCCA3E30052BD30 /* Products */;
@@ -575,6 +579,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		540A2D382DCFBC4B006DB88D /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.4;
+			};
+		};
 		548224772DCFA57E0034A1CC /* XCRemoteSwiftPackageReference "Factory" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hmlongco/Factory";
@@ -594,6 +606,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		540A2D392DCFBC4B006DB88D /* Collections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 540A2D382DCFBC4B006DB88D /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = Collections;
+		};
 		548224782DCFA58E0034A1CC /* Factory */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 548224772DCFA57E0034A1CC /* XCRemoteSwiftPackageReference "Factory" */;
