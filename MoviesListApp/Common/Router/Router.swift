@@ -6,8 +6,8 @@ import Observation
 class Router {
     var path = NavigationPath()
 
-    func navigateToMovieItemDetails(movieItemDetails: MovieItemDetails) {
-        path.append(Route.movieItemDetails(movieItemDetails: movieItemDetails))
+    func navigateToMovieItemDetails(movieItemId: Int) {
+        path.append(Route.movieItemDetails(movieItemId: movieItemId))
     }
 
     func popToRoot() {
@@ -16,7 +16,7 @@ class Router {
 }
 
 enum Route: Hashable {
-    case movieItemDetails(movieItemDetails: MovieItemDetails)
+    case movieItemDetails(movieItemId: Int)
 }
 
 extension View {
@@ -30,8 +30,8 @@ struct RouterViewModifier: ViewModifier {
     private func routeView(for route: Route) -> some View {
         Group {
             switch route {
-            case let .movieItemDetails(movieItemDetails):
-                MovieDetailsView(movieItemDetails: movieItemDetails)
+            case let .movieItemDetails(movieItemId):
+                MovieDetailsView(movieItemId: movieItemId)
             }
         }
         .environment(router)

@@ -4,8 +4,8 @@ struct MovieDetailsView: View {
     @ObservedObject private var viewModel: MovieDetailsViewModel
     @Environment(Router.self) var router
     
-    init(movieItemDetails: MovieItemDetails) {
-        _viewModel = ObservedObject(wrappedValue: MovieDetailsViewModel(movieItemDetails: movieItemDetails))
+    init(movieItemId: Int) {
+        _viewModel = ObservedObject(wrappedValue: MovieDetailsViewModel(movieItemId: movieItemId))
     }
 
     var body: some View {

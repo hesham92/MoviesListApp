@@ -1,7 +1,6 @@
 import Foundation
 import Combine
 
-@MainActor
 class MovieDetailsViewModel: ObservableObject {
     enum MovieItemDetailsSection: Hashable {
         case header(MovieDetailsHeaderViewPresentation)
@@ -19,8 +18,8 @@ class MovieDetailsViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(movieItemDetails: MovieItemDetails) {
-        self.movieItemDetails = movieItemDetails
+    init(movieItemId: Int) {
+        self.movieItemId = movieItemId
     }
 
     func viewDidAppear() {
@@ -28,7 +27,7 @@ class MovieDetailsViewModel: ObservableObject {
     }
 
     func loadData() {
-        state = .loaded(makeMovieItemDetailsSections(from: movieItemDetails))
+       // state = .loaded(makeMovieItemDetailsSections(from: movieItemDetails))
     }
     
     private func makeMovieItemDetailsSections(from movieItem: MovieItemDetails) -> [MovieItemDetailsSection] {
@@ -38,5 +37,5 @@ class MovieDetailsViewModel: ObservableObject {
         ]
     }
     
-    private let movieItemDetails: MovieItemDetails
+    private let movieItemId: Int
 }

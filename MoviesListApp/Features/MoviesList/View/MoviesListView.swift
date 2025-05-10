@@ -52,19 +52,25 @@ struct MoviesListView: View {
                 .foregroundColor(.white)
                 .padding()
 
-        case .loaded(let presentations):
+        case let .loaded(presentations, isLoading):
             ScrollView {
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(presentations.indices, id: \.self) { index in
-                        MovieGridItemView(item: presentations[index])
-                            .onAppear {
-                                if index == presentations.count - 1 {
-                                    viewModel.loadData()
+                ZStack {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(presentations.indices, id: \.self) { index in
+                            MovieGridItemView(item: presentations[index])
+                                .onAppear {
+                                    if index == presentations.count - 1 {
+                                        viewModel.loadData()
+                                    }
                                 }
-                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    
+                    if isLoading {
+                        LoadingView(isLoading: true)
                     }
                 }
-                .padding(.horizontal)
             }
         }
     }

@@ -9,6 +9,6 @@ struct MoviesListApp: App {
             MoviesListView(context: context)
                 .withRouter()
         }
-        .modelContainer(for: MovieItemDetails.self)
+        .modelContainer(for: MovieItem.self)
     }
 }
