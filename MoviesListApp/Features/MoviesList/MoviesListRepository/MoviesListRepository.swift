@@ -13,7 +13,7 @@ protocol MoviesListRepository {
 class MoviesListRepositoryImpl: MoviesListRepository {
     func loadMoviesListData(page: Int) -> AnyPublisher<MovieItemListResponse, Error> {
         Just(cache.load()).map {
-            MovieItemListResponse(totalPages: 100, results: $0)
+            MovieItemListResponse(results: $0)
         }
         .setFailureType(to: Error.self)
         .merge(with: networkMonitor.isConnectedPublisher.eraseToAnyPublisher().removeDuplicates().flatMap { [weak self] isConnected in

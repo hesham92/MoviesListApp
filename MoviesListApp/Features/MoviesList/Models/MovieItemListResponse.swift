@@ -16,7 +16,7 @@ class MovieItemListResponse: Identifiable, Codable, Equatable {
         case totalPages = "total_pages"
     }
 
-    init(totalPages: Int, results: [MovieItem]) {
+    init(totalPages: Int = 0, results: [MovieItem]) {
         self.totalPages = totalPages
         self.results = results
     }

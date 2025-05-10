@@ -46,7 +46,7 @@ class MoviesListViewModel: ObservableObject {
     private var movieItems: OrderedSet<MovieItemViewPresentation> = []
     private var filterList: [Genre] = []
 
-    private var totalPages = 10
+    private var totalPages = 0
     private var cancellables = Set<AnyCancellable>()
     
     @Injected(\.moviesListRepository) private var repository
