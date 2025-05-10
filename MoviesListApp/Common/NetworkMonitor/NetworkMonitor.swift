@@ -11,7 +11,7 @@ class NetworkMonitorImpl: NetworkMonitor, ObservableObject {
         $isConnected
     }
     
-    @Published var isConnected: Bool = false
+    @Published var isConnected: Bool = true
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")

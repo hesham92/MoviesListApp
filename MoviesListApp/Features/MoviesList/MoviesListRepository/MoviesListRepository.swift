@@ -12,21 +12,28 @@ protocol MoviesListRepository {
 
 class MoviesListRepositoryImpl: MoviesListRepository {
     func loadMoviesListData(page: Int) -> AnyPublisher<MovieItemListResponse, Error> {
-        Just(cache.load()).map {
-            MovieItemListResponse(results: $0)
-        }
-        .setFailureType(to: Error.self)
-        .merge(with: networkMonitor.isConnectedPublisher.eraseToAnyPublisher().removeDuplicates().flatMap { [weak self] isConnected in
-            guard let self, isConnected else { return Empty<MovieItemListResponse, Error>().eraseToAnyPublisher() }
-            
-            return networkClient.getData(endpoint: ApiEndpoints.moviesList(page: page))
-                .map{ [weak self] (response: MovieItemListResponse) in
-                    self?.cache.save(response.results)
-                    return response
+        networkMonitor
+            .isConnectedPublisher
+            .eraseToAnyPublisher()
+            .removeDuplicates()
+            .flatMap { [weak self] isConnected in
+                guard let self else { return Empty<MovieItemListResponse, Error>().eraseToAnyPublisher() }
+                guard isConnected else {
+                    return Just(cache.load())
+                        .setFailureType(to: Error.self)
+                        .map { MovieItemListResponse(results: $0) }
+                        .eraseToAnyPublisher()
                 }
-                .eraseToAnyPublisher()
-        })
-        .eraseToAnyPublisher()
+                
+                return networkClient.getData(endpoint: ApiEndpoints.moviesList(page: page))
+                    .map{ [weak self] (response: MovieItemListResponse) in
+                        self?.cache.save(response.results)
+                        return response
+                    }
+                    .eraseToAnyPublisher()
+            }
+        
+            .eraseToAnyPublisher()
     }
 
     func fetchMovieDetails(for id: Int) -> AnyPublisher<MovieItemDetails, Error> {
