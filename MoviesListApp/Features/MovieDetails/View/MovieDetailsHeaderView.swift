@@ -25,7 +25,7 @@ extension MovieDetailsHeaderViewPresentation: Hashable {
     }
 }
 
-struct MovieHeaderView: View {
+struct MovieDetailsHeaderView: View {
     let viewModel: MovieDetailsHeaderViewPresentation
     
     var body: some View {

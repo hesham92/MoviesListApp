@@ -37,10 +37,10 @@ struct MovieDetailsView: View {
                         MovieImage(path: path)
                         
                     case .header(let movieDetailsHeaderViewPresentation):
-                        MovieHeaderView(viewModel: movieDetailsHeaderViewPresentation)
+                        MovieDetailsHeaderView(viewModel: movieDetailsHeaderViewPresentation)
                         
                     case .content(let movieDetailsContentViewPresentation):
-                        MovieContentView(viewModel: movieDetailsContentViewPresentation)
+                        MovieDetailsContentView(viewModel: movieDetailsContentViewPresentation)
                     }
                 }
             }

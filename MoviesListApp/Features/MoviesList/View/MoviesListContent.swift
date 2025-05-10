@@ -44,8 +44,5 @@ struct MoviesListContent: View {
                 }
             )
         }
-        .onChange(of: viewModel.errorMessage) { error in
-            showAlert = error != nil
-        }
     }
 }
