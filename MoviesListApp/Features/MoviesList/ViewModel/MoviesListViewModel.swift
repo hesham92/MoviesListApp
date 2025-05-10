@@ -35,6 +35,7 @@ class MoviesListViewModel: ObservableObject {
 
     @Published private var currentPage = 1
     private var movieItems: OrderedSet<MovieItemViewPresentation> = []
+    private var filterMovieItems: OrderedSet<MovieItemViewPresentation> = []
     private var filterList: [Genre] = []
 
     private var totalPages = 10
@@ -51,7 +52,7 @@ class MoviesListViewModel: ObservableObject {
         
         currentPage += 1
         state = .loaded(
-            MovieListItemViewPresentation(moviesItemsList: movieItems, filterList: []),
+            MovieListItemViewPresentation(moviesItemsList: filterMovieItems, filterList: filterList),
             isLoading: true
         )
     }
@@ -75,13 +76,16 @@ class MoviesListViewModel: ObservableObject {
                     totalPages = movies.totalPages
                     movieItems.append(contentsOf: movies.results.map { MovieItemViewPresentation(movieItem: $0) })
                     if let selectedFilter {
-                        movieItems = movieItems.filter{ $0.movieItem.genreIds.contains(selectedFilter.id) }
+                        filterMovieItems = movieItems.filter{ $0.movieItem.genreIds.contains(selectedFilter.id) }
+                    } else {
+                        filterMovieItems = movieItems
                     }
+                    
                     filterList = filters.genres
                     
                     state = .loaded(
                         MovieListItemViewPresentation(
-                            moviesItemsList: movieItems,
+                            moviesItemsList: filterMovieItems,
                             filterList: filterList
                         ),
                         isLoading: false

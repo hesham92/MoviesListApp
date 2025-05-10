@@ -10,7 +10,11 @@ struct FilterView: View {
             HStack(spacing: 12) {
                 ForEach(filters, id: \.self) { filter in
                     Button(action: {
-                        selectedFilter = filter
+                        if selectedFilter == filter {
+                            selectedFilter = nil
+                        } else {
+                            selectedFilter = filter
+                        }
                     }) {
                         Text(filter.name)
                             .font(.system(size: 14, weight: .medium))
