@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftData
 
 class MovieDetailsViewModel: ObservableObject {
     enum MovieItemDetailsSection: Hashable {
@@ -7,7 +8,7 @@ class MovieDetailsViewModel: ObservableObject {
         case content(MovieDetailsContentViewPresentation)
     }
     
-    enum MovieDetailsViewState {
+    enum MovieDetailsViewState: Equatable {
         case loading
         case error(String)
         case loaded([MovieItemDetailsSection])
@@ -18,16 +19,33 @@ class MovieDetailsViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(movieItemId: Int) {
+    init(
+        movieItemId: Int,
+        context: ModelContext
+    ) {
         self.movieItemId = movieItemId
+        self.repository = MoviesListRepository(context: context)
     }
 
     func viewDidAppear() {
         loadData()
     }
-
+    
     func loadData() {
-       // state = .loaded(makeMovieItemDetailsSections(from: movieItemDetails))
+        repository.fetchMovieDetails(for: movieItemId)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    print("zss")
+                case .failure(_):
+                    print("zss")
+                }
+            }, receiveValue: { [weak self] movieItemDetails in
+                guard let self = self else { return }
+                state = .loaded(makeMovieItemDetailsSections(from: movieItemDetails))
+            })
+            .store(in: &cancellables)
     }
     
     private func makeMovieItemDetailsSections(from movieItem: MovieItemDetails) -> [MovieItemDetailsSection] {
@@ -38,4 +56,5 @@ class MovieDetailsViewModel: ObservableObject {
     }
     
     private let movieItemId: Int
+    private let repository: MoviesListRepository
 }

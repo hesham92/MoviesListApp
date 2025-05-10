@@ -1,11 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct MovieDetailsView: View {
-    @ObservedObject private var viewModel: MovieDetailsViewModel
     @Environment(Router.self) var router
+    @StateObject private var viewModel: MovieDetailsViewModel
     
-    init(movieItemId: Int) {
-        _viewModel = ObservedObject(wrappedValue: MovieDetailsViewModel(movieItemId: movieItemId))
+    init(movieItemId: Int, context: ModelContext) {
+        _viewModel = StateObject(wrappedValue: MovieDetailsViewModel(movieItemId: movieItemId, context: context))
     }
 
     var body: some View {
@@ -21,7 +22,6 @@ struct MovieDetailsView: View {
     
     @ViewBuilder
     private var content: some View {
-       
         switch viewModel.state {
         case .loading:
             LoadingView(isLoading: true)

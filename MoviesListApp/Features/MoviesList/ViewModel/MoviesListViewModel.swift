@@ -31,22 +31,17 @@ class MoviesListViewModel: ObservableObject {
         }
     }
 
+    @Published private var currentPage = 1
     @Published var movieItems: [MovieItemViewPresentation] = []
 
     private var totalPages = 10
-    @Published private var currentPage = 1
-    private var isConnected: Bool = true
-
-    private let networkMonitor: NetworkMonitor
     private let repository: MoviesListRepository
     private var cancellables = Set<AnyCancellable>()
 
     init(
-        context: ModelContext,
-        networkMonitor: NetworkMonitor = NetworkMonitor()
+        context: ModelContext
     ) {
         self.repository = MoviesListRepository(context: context)
-        self.networkMonitor = networkMonitor
     }
 
     func viewDidAppear() {

@@ -23,7 +23,7 @@ class MoviesListRepository: ObservableObject {
 //            }
     }
 
-    private func fetchMovieDetails(for id: Int) -> AnyPublisher<MovieItemDetails, Error> {
+    func fetchMovieDetails(for id: Int) -> some Publisher<MovieItemDetails, Error> {
         networkClient.getData(endpoint: ApiEndpoints.movieDetail(id: id))
     }
 }
