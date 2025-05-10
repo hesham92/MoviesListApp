@@ -4,12 +4,9 @@ import SwiftData
 struct MoviesListContent: View {
     @ObservedObject private var viewModel: MoviesListViewModel
     @Environment(Router.self) var router
-    @Binding var selectedMovieId: Int?
-    @State private var showAlert = false
 
-    init(modelContext: ModelContext, selectedMovieId: Binding<Int?>) {
+    init(modelContext: ModelContext) {
         _viewModel = ObservedObject(wrappedValue: MoviesListViewModel(context: modelContext))
-        self._selectedMovieId = selectedMovieId
     }
 
     private let columns = [
@@ -26,23 +23,44 @@ struct MoviesListContent: View {
                     .padding(.bottom, 10)
                     .frame(height: 40)
 
-                MovieGridView(viewModel: viewModel, selectedMovieId: $selectedMovieId)
+                content
                     .onAppear {
                         viewModel.viewDidAppear()
                     }
             }
-
-            LoadingView(isLoading: viewModel.isLoading)
         }
         .background(Color(UIColor.black))
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text("Error"),
-                message: Text(viewModel.errorMessage ?? "Unknown error"),
-                dismissButton: .default(Text("OK")) {
-                    viewModel.errorMessage = nil
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch viewModel.state {
+        case .loading:
+            LoadingView(isLoading: true)
+
+        case .error(let message):
+            ErrorView(message: message, retryAction: viewModel.loadData)
+
+        case .empty:
+            Text("No movies found.")
+                .foregroundColor(.white)
+                .padding()
+
+        case .loaded(let presentations):
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(presentations.indices, id: \.self) { index in
+                        MovieGridItemView(item: presentations[index])
+                            .onAppear {
+                                if index == presentations.count - 1 {
+                                    viewModel.loadData()
+                                }
+                            }
+                    }
                 }
-            )
+                .padding(.horizontal)
+            }
         }
     }
 }
+

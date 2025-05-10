@@ -4,6 +4,30 @@ import SwiftData
 
 @MainActor
 class MoviesListViewModel: ObservableObject {
+    
+    enum MoviesListViewState {
+        case loading
+        case error(String)
+        case loaded([MovieItemViewPresentation])
+        case empty
+    }
+
+    @Published var state: MoviesListViewState = .loading
+    @Published var selectedFilter: String = "All" {
+        didSet {
+           // applyFilter()
+        }
+    }
+
+    private var allMovies: [MovieItemDetails] = []
+    private var totalPages = 10
+    private var currentPage = 1
+    private var isConnected: Bool = true
+
+    private let repository: MoviesListRepository
+    private let networkMonitor: NetworkMonitor
+    private var cancellables = Set<AnyCancellable>()
+
     init(
         context: ModelContext,
         networkMonitor: NetworkMonitor = NetworkMonitor()
@@ -15,86 +39,90 @@ class MoviesListViewModel: ObservableObject {
     func viewDidAppear() {
         bindPublishers()
     }
-    
+
     func loadData() {
         guard currentPage <= totalPages else { return }
-        
-        isLoading = true
-        errorMessage = nil
-        
+        state = .loading
         repository.loadMoviesListData(page: currentPage, isOnline: isConnected)
     }
-    
+
     private func bindPublishers() {
         networkMonitor.$isConnected
-            .dropFirst() // Ignore initial emission
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 guard let self else { return }
-                
                 isConnected = status
                 loadData()
             }
             .store(in: &cancellables)
-        
-        
-        // Subscribe to the repository's publisher
+
         repository.$movies
-            .dropFirst() // Ignore initial emission
+            .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] data in
                 guard let self else { return }
-                
-                movies = data
-                currentPage += 1
+                self.allMovies += data
+                self.currentPage += 1
+                state = .loaded(allMovies.map { MovieItemViewPresentation(movieItem: $0) })
             }
             .store(in: &cancellables)
-        
-        repository.$isLoading
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.isLoading, on: self)
-            .store(in: &cancellables)
-        
+
         repository.$errorMessage
+            .compactMap { $0 }
             .receive(on: DispatchQueue.main)
-            .assign(to: \.errorMessage, on: self)
+            .sink { [weak self] error in
+                self?.state = .error(error)
+            }
             .store(in: &cancellables)
-        
-        
+
         repository.$totalPages
-            .dropFirst() // Ignore initial emission
-            .assign(to: \.totalPages, on: self)
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] pages in
+                self?.totalPages = pages
+            }
             .store(in: &cancellables)
     }
-    
-    // This function is called whenever the filter changes to apply the selected filter
-//    private func filterMovies() {
-//        // Filter the movies based on the selected filter
+
+//    private func applyFilter() {
+//        let filtered: [MovieItemDetails]
 //        if selectedFilter == "All" {
-//            filteredMovies = movies  // Show all movies
+//            filtered = allMovies
 //        } else {
-//            filteredMovies = movies.filter { movie in
-//                movie.genre == selectedFilter
-//            }
+//            filtered = allMovies.filter { $0.genre == selectedFilter }
+//        }
+//
+//        if filtered.isEmpty {
+//            state = .empty
+//        } else {
+//            let presentations = filtered.map { MovieItemViewPresentation(movieItem: $0) }
+//            state = .loaded(presentations)
 //        }
 //    }
+}
+
+
+import Foundation
+
+struct MovieItemViewPresentation: Hashable, Identifiable {
+    let id: Int
+    let title: String
+    let releaseDate: String
+    let posterPath: String
     
-    @Published var selectedFilter: String = "All" {
-        didSet {
-            // Apply filter when the selected filter changes
-           // filterMovies()
-        }
+    init(movieItem: MovieItemDetails) {
+        self.movieItem = movieItem
+        self.id = movieItem.id
+        self.title = movieItem.title
+        self.releaseDate = movieItem.releaseDate
+        self.posterPath = movieItem.posterPath
     }
     
-    var filteredMovies: [MovieItemDetails] = []
-    @Published var movies: [MovieItemDetails] = []
-    @Published var isLoading: Bool = false
-    @Published var errorMessage: String? = nil
-    @Published private var isConnected: Bool = true
-    private var totalPages = 10
-    private var currentPage = 1
-
-    private let repository: MoviesListRepository
-    private let networkMonitor: NetworkMonitor
-    private var cancellables = Set<AnyCancellable>()
+    let movieItem: MovieItemDetails
 }
+
+
+
+
+

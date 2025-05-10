@@ -3,14 +3,12 @@ import SwiftData
 import Kingfisher
 
 struct MovieGridItemView: View {
-    let item: MovieItemDetails
-    @Binding var selectedMovieId: Int?
+    let item: MovieItemViewPresentation
     @Environment(Router.self) var router
 
     var body: some View {
         Button(action: {
-            selectedMovieId = item.id
-            router.navigateToMovieItemDetails(movieItemDetails: item)
+            router.navigateToMovieItemDetails(movieItemDetails: item.movieItem)
         }) {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack {
