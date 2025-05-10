@@ -1,7 +1,7 @@
 import Foundation
 import SwiftData
 
-class MovieItemDetails: Identifiable, Codable {
+class MovieItemDetails: Identifiable, Codable, Hashable {
     var id: Int
     var title: String
     var overview: String
@@ -49,24 +49,24 @@ class MovieItemDetails: Identifiable, Codable {
         self.genres = genres
         self.spokenLanguages = spokenLanguages
     }
-}
 
-struct Genre: Codable {
-    let id: Int
-    let name: String
-}
-
-struct SpokenLanguage: Codable {
-    let englishName: String
-    let name: String
-
-    enum CodingKeys: String, CodingKey {
-        case englishName = "english_name"
-        case name
+    // Conform to Hashable by implementing hash(into:) method
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(title)
+        hasher.combine(overview)
+        hasher.combine(releaseDate)
+        hasher.combine(posterPath)
+        hasher.combine(homepage)
+        hasher.combine(budget)
+        hasher.combine(revenue)
+        hasher.combine(runtime)
+        hasher.combine(status)
+        hasher.combine(genres)
+        hasher.combine(spokenLanguages)
     }
-}
 
-extension MovieItemDetails: Equatable {
+    // Equatable already implemented, no need to modify
     static func == (lhs: MovieItemDetails, rhs: MovieItemDetails) -> Bool {
         return lhs.id == rhs.id &&
             lhs.title == rhs.title &&
@@ -83,15 +83,20 @@ extension MovieItemDetails: Equatable {
     }
 }
 
-extension Genre: Equatable {
-    static func == (lhs: Genre, rhs: Genre) -> Bool {
-        return lhs.id == rhs.id && lhs.name == rhs.name
-    }
+struct Genre: Codable, Hashable {
+    let id: Int
+    let name: String
+
+    // Hashable conformance is automatically provided for structs with only simple types like Int and String.
 }
 
-extension SpokenLanguage: Equatable {
-    static func == (lhs: SpokenLanguage, rhs: SpokenLanguage) -> Bool {
-        return lhs.englishName == rhs.englishName && lhs.name == rhs.name
+struct SpokenLanguage: Codable, Hashable {
+    let englishName: String
+    let name: String
+
+    enum CodingKeys: String, CodingKey {
+        case englishName = "english_name"
+        case name
     }
 }
 

@@ -10,7 +10,7 @@ struct MovieGridItemView: View {
     var body: some View {
         Button(action: {
             selectedMovieId = item.id
-            router.navigateToSetup(id: item.id)
+            router.navigateToMovieItemDetails(movieItemDetails: item)
         }) {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack {

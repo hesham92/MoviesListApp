@@ -17,11 +17,10 @@ class MovieDetailsViewModel: ObservableObject {
 
     @Published var state: MovieDetailsViewState = .loading
 
-    private let repository: MovieDetailsRepository
     private var cancellables = Set<AnyCancellable>()
 
-    init(movieId: Int) {
-        self.repository = MovieDetailsRepository(movieId: movieId)
+    init(movieItemDetails: MovieItemDetails) {
+        self.movieItemDetails = movieItemDetails
     }
 
     func viewDidAppear() {
@@ -29,44 +28,7 @@ class MovieDetailsViewModel: ObservableObject {
     }
 
     func loadData() {
-        state = .loading
-        repository.loadMovieDetails()
-        bindPublishers()
-    }
-
-    private func bindPublishers() {
-        // Bind repository to state
-        repository.$movie
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] movie in
-                guard let self else { return }
-                
-                if let movie = movie {
-                    self.state = .loaded(makeMovieItemDetailsSections(from: movie))
-                } else {
-                    self.state = .empty
-                }
-            }
-            .store(in: &cancellables)
-
-        repository.$isLoading
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] isLoading in
-                if isLoading {
-                    self?.state = .loading
-                }
-            }
-            .store(in: &cancellables)
-
-        repository.$errorMessage
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] errorMessage in
-                if let errorMessage = errorMessage {
-                    self?.state = .error(errorMessage)
-                }
-            }
-            .store(in: &cancellables)
+        state = .loaded(makeMovieItemDetailsSections(from: movieItemDetails))
     }
     
     private func makeMovieItemDetailsSections(from movieItem: MovieItemDetails) -> [MovieItemDetailsSection] {
@@ -75,4 +37,6 @@ class MovieDetailsViewModel: ObservableObject {
             .content(MovieDetailsContentViewPresentation(movieItem: movieItem))
         ]
     }
+    
+    private let movieItemDetails: MovieItemDetails
 }
