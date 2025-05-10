@@ -63,41 +63,43 @@ class MoviesListViewModel: ObservableObject {
     }
 
     private func bindPublishers() {
-        $currentPage
-            .removeDuplicates()
-            .flatMap { [repository] page in
-                 repository.loadMoviesListData(page: page)
+        Publishers.CombineLatest3(
+            $currentPage
+                .removeDuplicates()
+                .flatMap { [repository] page in
+                    repository.loadMoviesListData(page: page)
+                },
+            repository.fetchGenres(),
+            $selectedFilter.setFailureType(to: Error.self)
+        )
+        .asResult()
+        .receive(on: DispatchQueue.main)
+        .sink(receiveValue: { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let response):
+                let (movies, filters, selectedFilter) = response
+                totalPages = movies.totalPages
+                movieItems.append(contentsOf: movies.results.map { MovieItemViewPresentation(movieItem: $0) })
+                filterList = filters.genres
+                
+                state = .loaded(
+                    MovieListItemViewPresentation(
+                        moviesItemsList: movieItems.filter{
+                            guard let selectedFilter else { return true }
+                            return $0.movieItem.genreIds.contains(selectedFilter.id)
+                        },
+                        filterList: filterList
+                    ),
+                    isLoading: false
+                )
+                
+            case .failure(let error):
+                state = .error(error.localizedDescription)
             }
-            .combineLatest(repository.fetchGenres(), $selectedFilter.setFailureType(to: Error.self))
-            .asResult()
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { [weak self] result in
-                guard let self = self else { return }
-
-                switch result {
-                case .success(let response):
-                    let (movies, filters, selectedFilter) = response
-                    
-                    totalPages = movies.totalPages
-                    movieItems.append(contentsOf: movies.results.map { MovieItemViewPresentation(movieItem: $0) })
-                    filterList = filters.genres
-                    
-                    state = .loaded(
-                        MovieListItemViewPresentation(
-                            moviesItemsList: movieItems.filter{
-                                guard let selectedFilter else { return true }
-                                return $0.movieItem.genreIds.contains(selectedFilter.id)
-                            },
-                            filterList: filterList
-                        ),
-                        isLoading: false
-                    )
-                    
-                case .failure(let error):
-                    state = .error(error.localizedDescription)
-                }
-            })
-            .store(in: &cancellables)
+        })
+        .store(in: &cancellables)
     }
 }
 
