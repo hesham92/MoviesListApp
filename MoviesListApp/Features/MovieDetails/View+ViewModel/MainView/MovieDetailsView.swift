@@ -32,10 +32,7 @@ struct MovieDetailsView: View {
         case .loaded(let sections):
             VStack(alignment: .leading) {
                 ForEach(sections, id: \.self) { section in
-                    switch section {
-                    case .poster(let path):
-                        MovieImage(path: path)
-                        
+                    switch section {                        
                     case .header(let movieDetailsHeaderViewPresentation):
                         MovieDetailsHeaderView(viewModel: movieDetailsHeaderViewPresentation)
                         

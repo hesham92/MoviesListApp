@@ -4,7 +4,6 @@ import Combine
 @MainActor
 class MovieDetailsViewModel: ObservableObject {
     enum MovieItemDetailsSection: Hashable {
-        case poster(String)
         case header(MovieDetailsHeaderViewPresentation)
         case content(MovieDetailsContentViewPresentation)
     }
@@ -72,7 +71,6 @@ class MovieDetailsViewModel: ObservableObject {
     
     private func makeMovieItemDetailsSections(from movieItem: MovieItemDetails) -> [MovieItemDetailsSection] {
         [
-            .poster(movieItem.posterPath),
             .header(MovieDetailsHeaderViewPresentation(movieItem: movieItem)),
             .content(MovieDetailsContentViewPresentation(movieItem: movieItem))
         ]
