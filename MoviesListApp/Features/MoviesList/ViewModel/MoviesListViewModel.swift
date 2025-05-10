@@ -4,7 +4,6 @@ import SwiftData
 import Factory
 import OrderedCollections
 
-@MainActor
 class MoviesListViewModel: ObservableObject {
     enum MoviesListViewState: Equatable {
         case loading
@@ -43,7 +42,6 @@ class MoviesListViewModel: ObservableObject {
 
     func viewDidAppear() {
         bindPublishers()
-        loadData()
     }
 
     func loadData() {

@@ -23,64 +23,64 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "AFB5A3F2-224B-4F66-BE61-33DD9D5323FF"
+            uuid = "19E392E6-3038-4EF7-A13C-940D708A2253"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MoviesListApp/Features/MoviesList/MoviesListRepository/MoviesListRepository.swift"
+            filePath = "MoviesListApp/Features/MoviesList/ViewModel/MoviesListViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "15"
-            endingLineNumber = "15"
-            landmarkName = "loadMoviesListData(page:)"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
+            landmarkName = "loadData()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5B6CE4A3-D6BD-4972-8314-11EC5829F137"
+            uuid = "5609A058-7F15-40E6-99B0-9D43CCAC797B"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MoviesListApp/Common/MoviesCache.swift"
+            filePath = "MoviesListApp/Features/MoviesList/ViewModel/MoviesListViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "21"
-            endingLineNumber = "21"
-            landmarkName = "save(_:)"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
+            landmarkName = "bindPublishers()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "FE730876-DF19-458E-8090-A42EC4A3560F"
+            uuid = "D61202DF-C222-4B0D-9505-42033117D5CE"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MoviesListApp/Common/MoviesCache.swift"
+            filePath = "MoviesListApp/Features/MoviesList/ViewModel/MoviesListViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
-            landmarkName = "save(_:)"
+            startingLineNumber = "48"
+            endingLineNumber = "48"
+            landmarkName = "loadData()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "4ECB310B-DE09-4308-A63A-0C228F7197B1"
+            uuid = "4DFE4840-A289-4453-A7AA-B28F61BB3F92"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MoviesListApp/Features/MoviesList/MoviesListRepository/MoviesListRepository.swift"
+            filePath = "MoviesListApp/Features/MoviesList/ViewModel/MoviesListViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "21"
-            endingLineNumber = "21"
-            landmarkName = "loadMoviesListData(page:)"
+            startingLineNumber = "68"
+            endingLineNumber = "68"
+            landmarkName = "bindPublishers()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
