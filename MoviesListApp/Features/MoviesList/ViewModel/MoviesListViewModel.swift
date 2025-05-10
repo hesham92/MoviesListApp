@@ -60,19 +60,21 @@ class MoviesListViewModel: ObservableObject {
         $currentPage
             .removeDuplicates()
             .flatMap { [repository] page in
-                let res = repository.loadMoviesListData(page: page)
-                    .catch { error in
-                        
-                        Just(MovieItemListResponse(page: 0, totalResults: 0, totalPages: 0, results: []))
-                    }
-                return res
+                 repository.loadMoviesListData(page: page)
             }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] response in
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    print("dsdsds")
+                case .finished:
+                    print("dsdsds")
+                }
+            }, receiveValue: { [weak self] response in
                 guard let self = self else { return }
                 self.movieItems += response.results.map { MovieItemViewPresentation(movieItem: $0) }
                 state = .loaded(movieItems, isLoading: false)
-            }
+            })
             .store(in: &cancellables)
     }
 
