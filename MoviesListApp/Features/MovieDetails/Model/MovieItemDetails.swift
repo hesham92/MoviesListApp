@@ -1,7 +1,8 @@
 import Foundation
 import SwiftData
 
-class MovieItemDetails: Identifiable, Codable, Hashable {
+@Model
+class MovieItemDetails: Identifiable, Decodable, Hashable {
     var id: Int
     var title: String
     var overview: String
@@ -50,7 +51,40 @@ class MovieItemDetails: Identifiable, Codable, Hashable {
         self.spokenLanguages = spokenLanguages
     }
 
-    // Conform to Hashable by implementing hash(into:) method
+    // MARK: - Decodable
+    required convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        let id = try container.decode(Int.self, forKey: .id)
+        let title = try container.decode(String.self, forKey: .title)
+        let overview = try container.decode(String.self, forKey: .overview)
+        let releaseDate = try container.decode(String.self, forKey: .releaseDate)
+        let posterPath = try container.decode(String.self, forKey: .posterPath)
+        let homepage = try container.decode(String.self, forKey: .homepage)
+        let budget = try container.decode(Int.self, forKey: .budget)
+        let revenue = try container.decode(Int.self, forKey: .revenue)
+        let runtime = try container.decode(Int.self, forKey: .runtime)
+        let status = try container.decode(String.self, forKey: .status)
+        let genres = try container.decode([Genre].self, forKey: .genres)
+        let spokenLanguages = try container.decode([SpokenLanguage].self, forKey: .spokenLanguages)
+
+        self.init(
+            id: id,
+            title: title,
+            overview: overview,
+            releaseDate: releaseDate,
+            posterPath: posterPath,
+            homepage: homepage,
+            budget: budget,
+            revenue: revenue,
+            runtime: runtime,
+            status: status,
+            genres: genres,
+            spokenLanguages: spokenLanguages
+        )
+    }
+
+    // MARK: - Hashable
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(title)
@@ -66,7 +100,7 @@ class MovieItemDetails: Identifiable, Codable, Hashable {
         hasher.combine(spokenLanguages)
     }
 
-    // Equatable already implemented, no need to modify
+    // MARK: - Equatable
     static func == (lhs: MovieItemDetails, rhs: MovieItemDetails) -> Bool {
         return lhs.id == rhs.id &&
             lhs.title == rhs.title &&
@@ -83,20 +117,70 @@ class MovieItemDetails: Identifiable, Codable, Hashable {
     }
 }
 
-struct Genre: Codable, Hashable {
-    let id: Int
-    let name: String
+@Model
+class Genre: Decodable, Hashable {
+    var id: Int
+    var name: String
 
-    // Hashable conformance is automatically provided for structs with only simple types like Int and String.
+    init(id: Int, name: String) {
+        self.id = id
+        self.name = name
+    }
+
+    // Decodable
+    required convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(Int.self, forKey: .id)
+        let name = try container.decode(String.self, forKey: .name)
+        self.init(id: id, name: name)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name
+    }
+
+    // Hashable
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(name)
+    }
+
+    static func == (lhs: Genre, rhs: Genre) -> Bool {
+        return lhs.id == rhs.id && lhs.name == rhs.name
+    }
 }
 
-struct SpokenLanguage: Codable, Hashable {
-    let englishName: String
-    let name: String
+@Model
+class SpokenLanguage: Decodable, Hashable {
+    var englishName: String
+    var name: String
+
+    init(englishName: String, name: String) {
+        self.englishName = englishName
+        self.name = name
+    }
+
+    // Decodable
+    required convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let englishName = try container.decode(String.self, forKey: .englishName)
+        let name = try container.decode(String.self, forKey: .name)
+        self.init(englishName: englishName, name: name)
+    }
 
     enum CodingKeys: String, CodingKey {
         case englishName = "english_name"
         case name
+    }
+
+    // Hashable
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(englishName)
+        hasher.combine(name)
+    }
+
+    static func == (lhs: SpokenLanguage, rhs: SpokenLanguage) -> Bool {
+        return lhs.englishName == rhs.englishName && lhs.name == rhs.name
     }
 }
 

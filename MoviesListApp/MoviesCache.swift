@@ -9,7 +9,7 @@ class MoviesCache {
     }
 
     func clearCache() {
-        let descriptor = FetchDescriptor<MovieItem>()
+        let descriptor = FetchDescriptor<MovieItemDetails>()
         do {
             let allItems = try modelContext.fetch(descriptor)
             for item in allItems {
@@ -33,8 +33,8 @@ class MoviesCache {
         }
     }
 
-    func load() -> [MovieItem] {
-        let descriptor = FetchDescriptor<MovieItem>(sortBy: [SortDescriptor(\.title)])
+    func load() -> [MovieItemDetails] {
+        let descriptor = FetchDescriptor<MovieItemDetails>(sortBy: [SortDescriptor(\.title)])
         do {
             return try modelContext.fetch(descriptor)
         } catch {

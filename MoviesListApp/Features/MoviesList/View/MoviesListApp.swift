@@ -8,6 +8,6 @@ struct MoviesListApp: App {
             MoviesListView()
                 .withRouter()
         }
-        .modelContainer(for: MovieItem.self)
+        .modelContainer(for: MovieItemDetails.self)
     }
 }
