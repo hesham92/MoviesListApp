@@ -4,7 +4,7 @@ import SwiftData
 import Network
 
 class MoviesListRepository: ObservableObject {
-    @Published var movies: [MovieItemDetails] = []  // Now an array of MovieItemDetails
+    @Published var movies: [MovieItemDetails] = []
     @Published var totalPages: Int = 10
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
@@ -59,6 +59,7 @@ class MoviesListRepository: ObservableObject {
                 receiveValue: { [weak self] (moviesWithDetails: [MovieItemDetails]) in
                     guard let self = self else { return }
                     self.movies.append(contentsOf: moviesWithDetails)
+                    cache.save(movies)
                 }
             )
             .store(in: &cancellables)
