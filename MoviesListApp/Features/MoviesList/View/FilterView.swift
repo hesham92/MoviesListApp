@@ -2,8 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct FilterView: View {
-    let filters: [String]
-    @Binding var selectedFilter: String
+    let filters: [Genre]
+    @Binding var selectedFilter: Genre?
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -12,7 +12,7 @@ struct FilterView: View {
                     Button(action: {
                         selectedFilter = filter
                     }) {
-                        Text(filter)
+                        Text(filter.name)
                             .font(.system(size: 14, weight: .medium))
                             .padding(.horizontal, 24)
                             .padding(.vertical, 6)

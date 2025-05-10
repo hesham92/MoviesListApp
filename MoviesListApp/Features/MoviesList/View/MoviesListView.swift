@@ -10,11 +10,14 @@ struct MoviesListView: View {
         GridItem(.flexible())
     ]
 
-    private let filters = [
-        "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary",
-        "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery",
-        "Romance", "Science Fiction", "TV Movie", "Thriller", "War", "Western"
-    ]
+    private var filters: [Genre] {
+        switch viewModel.state {
+        case .loading, .error, .empty :
+            return []
+        case let .loaded(presentations, _):
+            return presentations.filterList
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -50,10 +53,12 @@ struct MoviesListView: View {
             ScrollView {
                 ZStack {
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(presentations.indices, id: \.self) { index in
-                            MovieGridItemView(item: presentations[index])
+                        ForEach(presentations.moviesItemsList, id: \.self) { item in
+                            MovieGridItemView(item: item)
                                 .onAppear {
-                                    if index == presentations.count - 1 {
+                                    let index = presentations.moviesItemsList.lastIndex(of: item)
+                                    if let index, index == presentations.moviesItemsList.count - 1 {
+                                        print(presentations.moviesItemsList[index], index)
                                         viewModel.loadData()
                                     }
                                 }

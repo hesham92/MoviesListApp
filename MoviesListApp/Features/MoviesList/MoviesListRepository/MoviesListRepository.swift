@@ -7,6 +7,7 @@ import Factory
 protocol MoviesListRepository {
     func loadMoviesListData(page: Int) -> AnyPublisher<MovieItemListResponse, Error>
     func fetchMovieDetails(for id: Int) -> AnyPublisher<MovieItemDetails, Error>
+    func fetchGenres() -> AnyPublisher<GenresResponse, Error>
 }
 
 class MoviesListRepositoryImpl: MoviesListRepository {
@@ -30,6 +31,10 @@ class MoviesListRepositoryImpl: MoviesListRepository {
 
     func fetchMovieDetails(for id: Int) -> AnyPublisher<MovieItemDetails, Error> {
         networkClient.getData(endpoint: ApiEndpoints.movieDetail(id: id))
+    }
+    
+    func fetchGenres() -> AnyPublisher<GenresResponse, Error> {
+        networkClient.getData(endpoint: ApiEndpoints.moviesGenres)
     }
     
     @Injected(\.networkClient) private var networkClient

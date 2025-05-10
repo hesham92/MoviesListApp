@@ -5,10 +5,15 @@ import Factory
 import OrderedCollections
 
 class MoviesListViewModel: ObservableObject {
+    struct MovieListItemViewPresentation: Equatable {
+        let moviesItemsList: OrderedSet<MovieItemViewPresentation>
+        let filterList: [Genre]
+    }
+    
     enum MoviesListViewState: Equatable {
         case loading
         case error(String)
-        case loaded(OrderedSet<MovieItemViewPresentation>, isLoading: Bool)
+        case loaded(MovieListItemViewPresentation, isLoading: Bool)
         case empty
         
         var isLoading: Bool {
@@ -25,15 +30,12 @@ class MoviesListViewModel: ObservableObject {
         }
     }
 
-    @Published var state: MoviesListViewState = .loading
-    @Published var selectedFilter: String = "All" {
-        didSet {
-            // applyFilter()
-        }
-    }
+    @Published private(set) var state: MoviesListViewState = .loading
+    @Published var selectedFilter: Genre?
 
     @Published private var currentPage = 1
-    @Published var movieItems: OrderedSet<MovieItemViewPresentation> = []
+    private var movieItems: OrderedSet<MovieItemViewPresentation> = []
+    private var filterList: [Genre] = []
 
     private var totalPages = 10
     private var cancellables = Set<AnyCancellable>()
@@ -48,7 +50,10 @@ class MoviesListViewModel: ObservableObject {
         guard currentPage <= totalPages, !state.isLoading else { return }
         
         currentPage += 1
-        state = .loaded(movieItems, isLoading: true)
+        state = .loaded(
+            MovieListItemViewPresentation(moviesItemsList: movieItems, filterList: []),
+            isLoading: true
+        )
     }
 
     private func bindPublishers() {
@@ -57,6 +62,7 @@ class MoviesListViewModel: ObservableObject {
             .flatMap { [repository] page in
                  repository.loadMoviesListData(page: page)
             }
+            .combineLatest(repository.fetchGenres(), $selectedFilter.setFailureType(to: Error.self))
             .asResult()
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] result in
@@ -64,8 +70,22 @@ class MoviesListViewModel: ObservableObject {
 
                 switch result {
                 case .success(let response):
-                    self.movieItems.append(contentsOf: response.results.map { MovieItemViewPresentation(movieItem: $0) })
-                    state = .loaded(movieItems, isLoading: false)
+                    let (movies, filters, selectedFilter) = response
+                    
+                    totalPages = movies.totalPages
+                    movieItems.append(contentsOf: movies.results.map { MovieItemViewPresentation(movieItem: $0) })
+                    if let selectedFilter {
+                        movieItems = movieItems.filter{ $0.movieItem.genreIds.contains(selectedFilter.id) }
+                    }
+                    filterList = filters.genres
+                    
+                    state = .loaded(
+                        MovieListItemViewPresentation(
+                            moviesItemsList: movieItems,
+                            filterList: filterList
+                        ),
+                        isLoading: false
+                    )
                     
                 case .failure(let error):
                     state = .error(error.localizedDescription)
@@ -73,8 +93,6 @@ class MoviesListViewModel: ObservableObject {
             })
             .store(in: &cancellables)
     }
-
-    // private func applyFilter() { ... }
 }
 
 
