@@ -2,7 +2,7 @@ import Network
 import Combine
 
 class NetworkMonitor: ObservableObject {
-    @Published var isConnected: Bool = true
+    @Published var isConnected: Bool = false
 
     private let monitor = NWPathMonitor()
     private let queue = DispatchQueue(label: "NetworkMonitorQueue")

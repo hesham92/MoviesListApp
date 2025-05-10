@@ -3,12 +3,12 @@ import SwiftData
 
 @main
 struct MoviesListApp: App {
-    @Environment(\.modelContext) private var context
+    @State private var context = try! ModelContext(ModelContainer(for: MovieItem.self))
     var body: some Scene {
         WindowGroup {
             MoviesListView(context: context)
                 .withRouter()
         }
-        .modelContainer(for: MovieItem.self)
+        .environment(\.modelContext, context)
     }
 }

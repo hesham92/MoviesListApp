@@ -22,7 +22,7 @@ class MoviesCache {
     }
 
     func save(_ items: [MovieItem]) {
-        clearCache()  // Clear existing items before saving new ones
+      //  clearCache()  // Clear existing items before saving new ones
         for item in items {
             modelContext.insert(item)
         }

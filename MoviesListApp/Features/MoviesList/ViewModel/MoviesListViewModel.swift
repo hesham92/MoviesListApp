@@ -62,18 +62,19 @@ class MoviesListViewModel: ObservableObject {
             .flatMap { [repository] page in
                  repository.loadMoviesListData(page: page)
             }
+            .asResult()
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .failure:
-                    print("dsdsds")
-                case .finished:
-                    print("dsdsds")
-                }
-            }, receiveValue: { [weak self] response in
+            .sink(receiveValue: { [weak self] result in
                 guard let self = self else { return }
-                self.movieItems += response.results.map { MovieItemViewPresentation(movieItem: $0) }
-                state = .loaded(movieItems, isLoading: false)
+
+                switch result {
+                case .success(let response):
+                    self.movieItems += response.results.map { MovieItemViewPresentation(movieItem: $0) }
+                    state = .loaded(movieItems, isLoading: false)
+                    
+                case .failure(let error):
+                    state = .error(error.localizedDescription)
+                }
             })
             .store(in: &cancellables)
     }
@@ -103,6 +104,14 @@ struct MovieItemViewPresentation: Hashable, Identifiable {
 }
 
 
-
+extension Publisher {
+  func asResult() -> some Publisher<Result<Output, Failure>, Never> {
+    self
+      .map(Result.success)
+      .catch { error in
+        Just(.failure(error))
+      }
+  }
+}
 
 

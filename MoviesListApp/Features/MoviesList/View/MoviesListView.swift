@@ -2,7 +2,6 @@ import SwiftUI
 import SwiftData
 
 struct MoviesListView: View {
-    @Environment(\.modelContext) private var context
     @Environment(Router.self) private var router
     @StateObject private var viewModel: MoviesListViewModel
 
