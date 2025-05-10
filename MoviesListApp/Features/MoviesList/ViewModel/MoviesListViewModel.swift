@@ -28,6 +28,15 @@ class MoviesListViewModel: ObservableObject {
                 false
             }
         }
+        
+        mutating func setLoading() {
+            switch self {
+            case .loading, .error, .empty:
+                self = .loading
+            case let .loaded(model, _):
+                self = .loaded(model, isLoading: true)
+            }
+        }
     }
 
     @Published private(set) var state: MoviesListViewState = .loading
@@ -35,7 +44,6 @@ class MoviesListViewModel: ObservableObject {
 
     @Published private var currentPage = 1
     private var movieItems: OrderedSet<MovieItemViewPresentation> = []
-    private var filterMovieItems: OrderedSet<MovieItemViewPresentation> = []
     private var filterList: [Genre] = []
 
     private var totalPages = 10
@@ -51,10 +59,7 @@ class MoviesListViewModel: ObservableObject {
         guard currentPage <= totalPages, !state.isLoading else { return }
         
         currentPage += 1
-        state = .loaded(
-            MovieListItemViewPresentation(moviesItemsList: filterMovieItems, filterList: filterList),
-            isLoading: true
-        )
+        state.setLoading()
     }
 
     private func bindPublishers() {
@@ -75,17 +80,14 @@ class MoviesListViewModel: ObservableObject {
                     
                     totalPages = movies.totalPages
                     movieItems.append(contentsOf: movies.results.map { MovieItemViewPresentation(movieItem: $0) })
-                    if let selectedFilter {
-                        filterMovieItems = movieItems.filter{ $0.movieItem.genreIds.contains(selectedFilter.id) }
-                    } else {
-                        filterMovieItems = movieItems
-                    }
-                    
                     filterList = filters.genres
                     
                     state = .loaded(
                         MovieListItemViewPresentation(
-                            moviesItemsList: filterMovieItems,
+                            moviesItemsList: movieItems.filter{
+                                guard let selectedFilter else { return true }
+                                return $0.movieItem.genreIds.contains(selectedFilter.id)
+                            },
                             filterList: filterList
                         ),
                         isLoading: false
