@@ -19,10 +19,7 @@ struct MovieGridItemView: View {
                         .frame(height: 140)
                         .cornerRadius(8)
                     
-                    KFImage(URL(string: "https://image.tmdb.org/t/p/w500\(item.posterPath)"))
-                        .cacheOriginalImage()
-                        .resizable()
-                        .scaledToFill()
+                    MovieImageView(path: item.posterPath)
                         .frame(height: 140)
                         .clipped()
                         .cornerRadius(8)

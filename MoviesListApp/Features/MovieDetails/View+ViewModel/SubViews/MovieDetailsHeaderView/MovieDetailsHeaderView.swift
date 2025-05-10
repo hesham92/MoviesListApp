@@ -4,10 +4,10 @@ struct MovieDetailsHeaderView: View {
     let viewModel: MovieDetailsHeaderViewPresentation
     
     var body: some View {
-        MovieImage(path: viewModel.posterPath)
+        MovieImageView(path: viewModel.posterPath)
 
         HStack(alignment: .top) {
-            MovieImage(path: viewModel.posterPath)
+            MovieImageView(path: viewModel.posterPath)
                 .frame(width: 50, height: 100)
                 .padding(.horizontal, 8)
             
