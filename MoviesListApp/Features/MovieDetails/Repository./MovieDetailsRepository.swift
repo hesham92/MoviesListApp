@@ -44,17 +44,6 @@ class MovieDetailsRepository: ObservableObject {
             )
             .store(in: &cancellables)
     }
-
-    private func downloadImage(for path: String, completion: @escaping (Data?) -> Void) {
-        guard let url = URL(string: "https://image.tmdb.org/t/p/w500" + path) else {
-            completion(nil)
-            return
-        }
-
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            completion(data)
-        }.resume()
-    }
     
     private let movieId: Int
     private let networkClient: NetworkClient
