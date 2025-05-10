@@ -7,7 +7,6 @@ class MovieItem: Identifiable, Codable {
     var title: String
     var posterPath: String
     var releaseDate: String
-    var imageData: Data? = nil // Add this
 
     enum CodingKeys: String, CodingKey {
         case id, title

@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Kingfisher
 
 struct MovieGridItemView: View {
     let item: MovieItem
@@ -17,23 +18,21 @@ struct MovieGridItemView: View {
                         .fill(Color.gray.opacity(0.3))
                         .frame(height: 140)
                         .cornerRadius(8)
-
-                    if let data = item.imageData,
-                       let uiImage = UIImage(data: data) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 140)
-                            .clipped()
-                            .cornerRadius(8)
-                    }
+                    
+                    KFImage(URL(string: "https://image.tmdb.org/t/p/w500\(item.posterPath)"))
+                        .cacheOriginalImage()
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 140)
+                        .clipped()
+                        .cornerRadius(8)
                 }
-
+                
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.title)
                         .font(.headline)
                         .foregroundColor(.white)
-
+                    
                     Text(item.releaseDate)
                         .font(.subheadline)
                         .foregroundColor(.white.opacity(0.8))

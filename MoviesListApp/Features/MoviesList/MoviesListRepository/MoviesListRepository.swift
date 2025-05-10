@@ -44,28 +44,9 @@ class MoviesListRepository: ObservableObject {
                     totalPages = response.totalPages
                   //  cache.save(response.results)
 
-                    downloadImages(results: response.results)
                 }
             )
             .store(in: &cancellables)
-    }
-
-    private func downloadImages(results: [MovieItem]) {
-        for item in results {
-            self.downloadImage(for: item) { imageData in
-                item.imageData = imageData
-            }
-        }
-    }
-    private func downloadImage(for item: MovieItem, completion: @escaping (Data?) -> Void) {
-        guard let url = URL(string: "https://image.tmdb.org/t/p/w500" + item.posterPath) else {
-            completion(nil)
-            return
-        }
-
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            completion(data)
-        }.resume()
     }
     
     

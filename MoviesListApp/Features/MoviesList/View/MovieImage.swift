@@ -1,4 +1,5 @@
 import SwiftUI
+import Kingfisher
 
 struct MovieImage: View {
     var path: String = ""
