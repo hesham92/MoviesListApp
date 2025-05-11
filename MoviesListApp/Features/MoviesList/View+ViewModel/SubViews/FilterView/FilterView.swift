@@ -2,19 +2,14 @@ import SwiftUI
 import SwiftData
 
 struct FilterView: View {
-    let filters: [Genre]
-    @Binding var selectedFilter: Genre?
+    @ObservedObject var viewModel: FilterViewModel
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                ForEach(filters, id: \.self) { filter in
+                ForEach(viewModel.filters, id: \.self) { filter in
                     Button(action: {
-                        if selectedFilter == filter {
-                            selectedFilter = nil
-                        } else {
-                            selectedFilter = filter
-                        }
+                        viewModel.toggleFilter(filter)
                     }) {
                         Text(filter.name)
                             .font(.system(size: 14, weight: .medium))
@@ -22,13 +17,13 @@ struct FilterView: View {
                             .padding(.vertical, 6)
                             .background(
                                 RoundedRectangle(cornerRadius: 20)
-                                    .fill(selectedFilter == filter ? Color.yellow : Color.black)
+                                    .fill(viewModel.backgroundColor(for: filter))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 20)
-                                            .stroke(Color.yellow, lineWidth: 1)  // Optional border around unselected button
+                                            .stroke(Color.yellow, lineWidth: 1)
                                     )
                             )
-                            .foregroundColor(selectedFilter == filter ? .black : .white)
+                            .foregroundColor(viewModel.textColor(for: filter))
                     }
                 }
             }
@@ -36,3 +31,4 @@ struct FilterView: View {
         }
     }
 }
+

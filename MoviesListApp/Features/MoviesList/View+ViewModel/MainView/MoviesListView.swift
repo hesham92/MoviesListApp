@@ -12,7 +12,7 @@ struct MoviesListView: View {
 
     private var filters: [Genre] {
         switch viewModel.state {
-        case .loading, .error, .empty :
+        case .loading, .error, .empty:
             return []
         case let .loaded(presentations, _):
             return presentations.filterList
@@ -22,7 +22,7 @@ struct MoviesListView: View {
     var body: some View {
         ZStack {
             VStack {
-                FilterView(filters: filters, selectedFilter: $viewModel.selectedFilter)
+                FilterView(viewModel: FilterViewModel(filters: filters, selectedFilter: $viewModel.selectedFilter))
                     .padding(.bottom, 10)
                     .frame(height: 40)
 
@@ -65,7 +65,7 @@ struct MoviesListView: View {
                         }
                     }
                     .padding(.horizontal)
-                    
+
                     if isLoading {
                         LoadingView(isLoading: true)
                     }
