@@ -180,4 +180,3 @@ class SpokenLanguage: Decodable, Hashable {
         return lhs.englishName == rhs.englishName && lhs.name == rhs.name
     }
 }
-
