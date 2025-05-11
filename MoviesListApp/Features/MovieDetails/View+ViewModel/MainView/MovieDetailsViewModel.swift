@@ -33,16 +33,18 @@ class MovieDetailsViewModel: ObservableObject {
     func loadData() {
         repository.fetchMovieDetails(for: movieItemId)
             .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    print("zss")
-                case .failure(_):
-                    print("zss")
-                }
-            }, receiveValue: { [weak self] movieItemDetails in
+            .asResult()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] result in
                 guard let self = self else { return }
-                state = .loaded(makeMovieItemDetailsSections(from: movieItemDetails))
+                
+                switch result {
+                case .success(let movieItemDetails):
+                    state = .loaded(makeMovieItemDetailsSections(from: movieItemDetails))
+                    
+                case .failure(let error):
+                    state = .error(error.localizedDescription)
+                }
             })
             .store(in: &cancellables)
     }
