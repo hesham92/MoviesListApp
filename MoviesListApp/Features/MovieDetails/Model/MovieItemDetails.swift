@@ -139,7 +139,6 @@ class Genre: Decodable, Hashable {
         case id, name
     }
 
-    // Hashable
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(name)
@@ -160,7 +159,6 @@ class SpokenLanguage: Decodable, Hashable {
         self.name = name
     }
 
-    // Decodable
     required convenience init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let englishName = try container.decode(String.self, forKey: .englishName)
@@ -173,7 +171,6 @@ class SpokenLanguage: Decodable, Hashable {
         case name
     }
 
-    // Hashable
     func hash(into hasher: inout Hasher) {
         hasher.combine(englishName)
         hasher.combine(name)

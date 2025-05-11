@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MovieDetailsContentView: View {
     var viewModel: MovieDetailsContentViewPresentation
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(viewModel.overviewText)

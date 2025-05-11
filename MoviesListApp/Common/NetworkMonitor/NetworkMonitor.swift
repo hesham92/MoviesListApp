@@ -7,6 +7,15 @@ protocol NetworkMonitor {
 }
 
 class NetworkMonitorImpl: NetworkMonitor, ObservableObject {
+    private let monitor = NWPathMonitor()
+    private let queue = DispatchQueue(label: "NetworkMonitorQueue")
+    
+    var isConnectedPublisher: any Publisher<Bool, Never> {
+        $isConnected
+    }
+    
+    @Published var isConnected: Bool = true
+
     init() {
         monitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
@@ -19,13 +28,4 @@ class NetworkMonitorImpl: NetworkMonitor, ObservableObject {
     deinit {
         monitor.cancel()
     }
-    
-    @Published var isConnected: Bool = true
-    
-    var isConnectedPublisher: any Publisher<Bool, Never> {
-        $isConnected
-    }
-
-    private let monitor = NWPathMonitor()
-    private let queue = DispatchQueue(label: "NetworkMonitorQueue")
 }

@@ -39,17 +39,16 @@ class MoviesListViewModel: ObservableObject {
         }
     }
 
+    @Injected(\.moviesListRepository) private var repository
+    
     @Published private(set) var state: MoviesListViewState = .loading
     @Published var selectedFilter: Genre?
-
     @Published private var currentPage = 1
+    
     private var movieItems: OrderedSet<MovieItemViewPresentation> = []
     private var filterList: [Genre] = []
-
     private var totalPages = 0
     private var cancellables = Set<AnyCancellable>()
-    
-    @Injected(\.moviesListRepository) private var repository
 
     func viewDidAppear() {
         bindPublishers()

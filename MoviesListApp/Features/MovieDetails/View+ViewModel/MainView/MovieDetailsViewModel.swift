@@ -16,9 +16,11 @@ class MovieDetailsViewModel: ObservableObject {
         case empty
     }
 
+    @Injected(\.moviesListRepository) private var repository
     @Published var state: MovieDetailsViewState = .loading
-
+    
     private var cancellables = Set<AnyCancellable>()
+    private let movieItemId: Int
 
     init(movieItemId: Int) {
         self.movieItemId = movieItemId
@@ -51,7 +53,4 @@ class MovieDetailsViewModel: ObservableObject {
             .content(MovieDetailsContentViewPresentation(movieItem: movieItem))
         ]
     }
-    
-    private let movieItemId: Int
-    @Injected(\.moviesListRepository) private var repository
 }

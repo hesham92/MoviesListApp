@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct MovieDetailsView: View {
-    @Environment(Router.self) var router
+    @Environment(Router.self) private var router
     @StateObject private var viewModel: MovieDetailsViewModel
     
     init(movieItemId: Int) {

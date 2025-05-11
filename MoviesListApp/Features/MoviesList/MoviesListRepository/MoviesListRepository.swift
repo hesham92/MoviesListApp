@@ -11,6 +11,10 @@ protocol MoviesListRepository {
 }
 
 class MoviesListRepositoryImpl: MoviesListRepository {
+    @Injected(\.networkClient) private var networkClient
+    @Injected(\.networkMonitor) private var networkMonitor
+    @Injected(\.moviesCache) private var cache
+    
     func loadMoviesListData(page: Int) -> AnyPublisher<MovieItemListResponse, Error> {
         networkMonitor
             .isConnectedPublisher
@@ -43,8 +47,4 @@ class MoviesListRepositoryImpl: MoviesListRepository {
     func fetchGenres() -> AnyPublisher<GenresResponse, Error> {
         networkClient.getData(endpoint: ApiEndpoints.moviesGenres)
     }
-    
-    @Injected(\.networkClient) private var networkClient
-    @Injected(\.networkMonitor) private var networkMonitor
-    @Injected(\.moviesCache) private var cache
 }

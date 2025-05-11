@@ -7,6 +7,8 @@ protocol MoviesCache {
 }
 
 class MoviesCacheImpl: MoviesCache {
+    private let modelContext: ModelContext
+    
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
     }
@@ -31,7 +33,5 @@ class MoviesCacheImpl: MoviesCache {
             return []
         }
     }
-    
-    private let modelContext: ModelContext
 }
 
