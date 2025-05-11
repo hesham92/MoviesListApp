@@ -10,7 +10,7 @@ struct MovieDetailsContentViewPresentation {
     }
 
     var budgetText: String {
-        return "Budget: \(movieItem.budget.formatted(.currency(code: "USD")))"
+        return "Budget: \(movieItem.budget.formattedWithoutSeparatorAndCurrency())"
     }
 
     var statusText: String {
@@ -20,11 +20,11 @@ struct MovieDetailsContentViewPresentation {
     var runtimeText: String {
         return "Runtime: \(movieItem.runtime) minutes"
     }
-
+    
     var revenueText: String {
-        return "Revenue: \(movieItem.revenue.formatted(.currency(code: "USD")))"
+        return "Revenue: \(movieItem.revenue.formattedWithoutSeparatorAndCurrency())"
     }
-
+    
     var homepageText: String {
         return "Homepage: \(movieItem.homepage)"
     }
