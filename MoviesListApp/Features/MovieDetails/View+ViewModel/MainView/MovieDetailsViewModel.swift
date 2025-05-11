@@ -32,7 +32,6 @@ class MovieDetailsViewModel: ObservableObject {
     
     func loadData() {
         repository.fetchMovieDetails(for: movieItemId)
-            .receive(on: DispatchQueue.main)
             .asResult()
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] result in
