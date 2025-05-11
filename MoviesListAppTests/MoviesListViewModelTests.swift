@@ -10,6 +10,7 @@ final class MoviesListViewModelTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        
         repository = MockMoviesListRepository()
         Container.shared.moviesListRepository.register { self.repository }
         viewModel = MoviesListViewModel()
@@ -20,6 +21,7 @@ final class MoviesListViewModelTests: XCTestCase {
         viewModel = nil
         repository = nil
         cancellables = nil
+        
         super.tearDown()
     }
 
@@ -28,7 +30,7 @@ final class MoviesListViewModelTests: XCTestCase {
     }
 
     func test_loadData_success() {
-        let movie = MovieItem(id: 1, title: "Test", releaseDate: "2023-01-01", posterPath: "/path")
+        let movie = MovieItem(id: 1, title: "Test", releaseDate: "2023-01-01", posterPath: "/path", genreIds: [])
         let response = MovieItemListResponse(totalPages: 100, results: [movie])
         repository.result = .success(response)
 
@@ -37,8 +39,12 @@ final class MoviesListViewModelTests: XCTestCase {
         viewModel.viewDidAppear()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            XCTAssertEqual(self.viewModel.movieItems.count, 1)
-            XCTAssertEqual(self.viewModel.state, .loaded(self.viewModel.movieItems, isLoading: false))
+            if case let .loaded(presentations, isLoading) = self.viewModel.state {
+                XCTAssertEqual(presentations.moviesItemsList.count, 1)
+                XCTAssertFalse(isLoading)
+            } else {
+                XCTFail("Expected error state")
+            }
             expectation.fulfill()
         }
 
@@ -65,7 +71,7 @@ final class MoviesListViewModelTests: XCTestCase {
     }
 
     func test_loadData_incrementCurrentPage() {
-        let movie = MovieItem(id: 1, title: "Test", releaseDate: "2023-01-01", posterPath: "/path")
+        let movie = MovieItem(id: 1, title: "Test", releaseDate: "2023-01-01", posterPath: "/path", genreIds: [])
         let response = MovieItemListResponse(totalPages: 100, results: [movie])
         repository.result = .success(response)
 
@@ -105,7 +111,15 @@ class MockMoviesListRepository: MoviesListRepository {
     }
         
     func fetchMovieDetails(for id: Int) -> AnyPublisher<MovieItemDetails, Error> {
-        fatalError()
+        fatalError() // Later
+    }
+    
+    func fetchGenres() -> AnyPublisher<GenresResponse, any Error> {
+        let genre = Genre(id: 1, name: "Action")
+        let response = GenresResponse(genres: [genre])
+        return Just(response)
+            .setFailureType(to: Error.self)
+            .eraseToAnyPublisher()
     }
 }
 
