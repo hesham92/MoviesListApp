@@ -1,7 +1,7 @@
 import SwiftUI
 
 class FilterViewModel: ObservableObject {
-    @Binding var selectedFilter: Genre?  // Binding to selected filter from parent view
+    @Binding var selectedFilter: Genre?
     let filters: [Genre]
 
     // Computed properties to manage color based on selected filter
